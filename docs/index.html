@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NanoDNS - Lightweight DNS Server for Docker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e40af;
+            --text: #1f2937;
+            --light: #f3f4f6;
+            --code-bg: #1f2937;
+            --code-text: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            padding-top: 60px;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            margin-left: 2rem;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light);
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        .code-tabs {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+
+        .tab-buttons {
+            display: flex;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .tab-btn.active {
+            background: white;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .tab-content {
+            padding: 1.5rem;
+        }
+
+        .badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            background: var(--light);
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .sections {
+            display: grid;
+            gap: 4rem;
+            margin: 4rem 0;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        .footer {
+            background: var(--code-bg);
+            color: white;
+            padding: 4rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer h3 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .footer a {
+            color: var(--light);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="#" class="nav-logo">NanoDNS</a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#quickstart">Quick Start</a>
+                <a href="#kubernetes">Kubernetes</a>
+                <a href="#docs">Documentation</a>
+                <a href="https://github.com/mguptahub/nanodns" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>NanoDNS</h1>
+        <p>A lightweight DNS server designed for Docker Compose environments, allowing dynamic resolution of service names and custom DNS records.</p>
+        <div class="buttons">
+            <a href="https://github.com/mguptahub/nanodns" class="btn btn-primary"><i class="fab fa-github"></i> View on GitHub</a>
+            <a href="#quickstart" class="btn btn-secondary">Quick Start Guide</a>
+        </div>
+        <div class="badges">
+            <a href="https://github.com/mguptahub/nanodns/actions/workflows/build.yml" class="badge">
+                <img src="https://github.com/mguptahub/nanodns/actions/workflows/build.yml/badge.svg" alt="Build">
+            </a>
+            <a href="https://github.com/mguptahub/nanodns/releases" class="badge">
+                <img src="https://img.shields.io/github/v/release/mguptahub/nanodns?include_prereleases&sort=semver" alt="Release">
+            </a>
+            <a href="LICENSE" class="badge">
+                <img src="https://img.shields.io/badge/License-AGPL%20v2-blue.svg" alt="License">
+            </a>
+            <a href="go.mod" class="badge">
+                <img src="https://img.shields.io/badge/Go-v1.21-blue" alt="Go Version">
+            </a>
+        </div>
+    </section>
+
+    <div class="container">
+        <section class="features" id="features">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-cogs"></i></div>
+                <h3>Easy Configuration</h3>
+                <p>Configure DNS records using simple environment variables. Supports A, CNAME, MX, and TXT records.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fab fa-docker"></i></div>
+                <h3>Docker Integration</h3>
+                <p>Seamless integration with Docker and Kubernetes environments. Automatic service discovery and resolution.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-tachometer-alt"></i></div>
+                <h3>Lightweight</h3>
+                <p>Minimal resource footprint. Perfect for development and production environments.</p>
+            </div>
+        </section>
+
+        <section class="sections" id="quickstart">
+            <h2>Quick Start</h2>
+            <div class="code-tabs">
+                <div class="tab-buttons">
+                    <button class="tab-btn active">Docker Compose</button>
+                    <button class="tab-btn">Docker Run</button>
+                </div>
+                <div class="tab-content">
+                    <pre>
+version: '3'
+services:
+  dns:
+    image: ghcr.io/mguptahub/nanodns:latest
+    environment:
+      - DNS_PORT=5353
+      - A_REC1=app.local|service:webapp
+      - A_REC2=api.local|192.168.1.10
+    ports:
+      - "5353:5353/udp"</pre>
+                </div>
+            </div>
+        </section>
+
+        [Additional sections for Kubernetes, Documentation, etc.]
+
+        <section class="sections" id="docs">
+            <h2>Documentation</h2>
+            <div class="features">
+                <a href="https://github.com/mguptahub/nanodns/blob/main/kubernetes/README.md" class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-ship"></i></div>
+                    <h3>Kubernetes Guide</h3>
+                    <p>Detailed instructions for deploying NanoDNS in Kubernetes environments.</p>
+                </a>
+                <a href="https://github.com/mguptahub/nanodns/blob/main/SECURITY.md" class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3>Security</h3>
+                    <p>Security policy and guidelines for reporting vulnerabilities.</p>
+                </a>
+                <a href="https://github.com/mguptahub/nanodns/blob/main/.github/OSS.md" class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-code-branch"></i></div>
+                    <h3>Contributing</h3>
+                    <p>Guidelines for contributing to NanoDNS development.</p>
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div>
+                <h3>NanoDNS</h3>
+                <p>Open source DNS server for Docker environments</p>
+            </div>
+            <div>
+                <h3>Links</h3>
+                <p><a href="https://github.com/mguptahub/nanodns">GitHub Repository</a></p>
+                <p><a href="https://github.com/mguptahub/nanodns/issues">Issue Tracker</a></p>
+                <p><a href="https://github.com/mguptahub/nanodns/releases">Releases</a></p>
+            </div>
+            <div>
+                <h3>Community</h3>
+                <p><a href="https://github.com/mguptahub/nanodns/discussions">Discussions</a></p>
+                <p><a href="https://github.com/mguptahub/nanodns/blob/main/CONTRIBUTING.md">Contributing</a></p>
+                <p><a href="https://github.com/mguptahub/nanodns/blob/main/SECURITY.md">Security</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple tab functionality
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
