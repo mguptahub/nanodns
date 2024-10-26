@@ -1,4 +1,19 @@
+[![Build](https://github.com/mguptahub/nanodns/actions/workflows/build.yml/badge.svg)](https://github.com/mguptahub/nanodns/actions/workflows/build.yml)
+[![Release](https://img.shields.io/github/v/release/mguptahub/nanodns?sort=semver)](https://github.com/mguptahub/nanodns/releases)
+[![Issues](https://img.shields.io/github/issues/mguptahub/nanodns)](https://github.com/mguptahub/nanodns/issues)
+
+[![License: AGPL v2](https://img.shields.io/badge/License-AGPL%20v2-blue.svg)](https://www.gnu.org/licenses/agpl-2.0)
+[![Security Policy](https://img.shields.io/badge/Security-Policy-blue.svg)](SECURITY.md)
+
+[![Docker Pulls](https://img.shields.io/docker/pulls/mguptahub/nanodns)](https://github.com/mguptahub/nanodns/pkgs/container/nanodns)
+[![Docker Image Size](https://img.shields.io/docker/image-size/mguptahub/nanodns/latest)](https://github.com/mguptahub/nanodns/pkgs/container/nanodns)
+
+[![Go Version](https://img.shields.io/github/go-mod/go-version/mguptahub/nanodns)](go.mod)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mguptahub/nanodns)](https://goreportcard.com/report/github.com/mguptahub/nanodns)
+
+
 # Nano DNS Server
+
 
 A lightweight DNS server designed for Docker Compose environments, allowing dynamic resolution of service names and custom DNS records.
 
@@ -153,6 +168,9 @@ networks:
     driver: bridge
 ```
 
+### Kubernetes
+For detailed instructions on deploying NanoDNS in Kubernetes, see our [Kubernetes Deployment Guide](kubernetes/README.md).
+
 ## Running Without Docker Compose
 
 ```bash
@@ -236,8 +254,6 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
 ## License and Usage Terms
 
-[![License: AGPL v2](https://img.shields.io/badge/License-AGPL%20v2-blue.svg)](https://www.gnu.org/licenses/agpl-2.0)
-
 NanoDNS is open-source software licensed under AGPLv2. This means:
 
 ✅ You CAN:
@@ -293,3 +309,7 @@ an open-source DNS server licensed under AGPL-2.0.
 
 ### Important Note
 If you plan to use NanoDNS in your project, ensure your project's license is compatible with AGPLv2. When in doubt, open an issue for clarification.
+
+
+---
+
