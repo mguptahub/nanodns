@@ -12,8 +12,14 @@ func main() {
 	// Load records from environment variables
 	records := dns.LoadRecords()
 
+	// Get relay configuration
+	relayConfig := config.GetRelayConfig()
+	if relayConfig.Enabled {
+		log.Printf("DNS relay enabled, using nameservers: %v", relayConfig.Nameservers)
+	}
+
 	// Create DNS handler
-	handler := dns.NewHandler(records)
+	handler := dns.NewHandler(records, relayConfig) // Fixed: Pass RelayConfig directly
 	externaldns.HandleFunc(".", handler.ServeDNS)
 
 	// Configure server
