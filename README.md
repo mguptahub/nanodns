@@ -115,13 +115,27 @@ TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all|3600
 TXT_REC2=_dmarc.example.com|v=DMARC1; p=reject; rua=mailto:dmarc@example.com
 ```
 
-## Docker Compose Usage
 
+## Docker Usage
+
+### Using Docker Run
+```bash
+docker run -d \
+  --name nanodns \
+  -p 5353:5353/udp \
+  -e DNS_PORT=5353 \
+  -e "A_REC1=app.example.com|192.168.1.10|300" \
+  -e "A_REC2=api.example.com|service:webapp" \
+  -e "TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all" \
+  ghcr.io/mguptahub/nanodns:latest
+```
+
+### Using Docker Compose
 ```yaml
 name: nanodns
 services:
   dns:
-    build: .
+    image: ghcr.io/mguptahub/nanodns:latest
     environment:
       - DNS_PORT=5353  # Optional, defaults to 53
       # A Records
@@ -177,10 +191,44 @@ dig @localhost -p 5353 example.com TXT
    - Use a port number above 1024 to avoid requiring root privileges
    - Set `DNS_PORT=5353` or another high-numbered port
 
-## Development
+## Issues and Support
 
-```bash
-# Build the server
-go build -o nanodns cmd/server/main.go
+### Opening New Issues
 
-```
+Before opening a new issue:
+
+1. Check existing issues to avoid duplicates
+2. Use issue templates when available
+3. Include:
+   - NanoDNS version
+   - Operating system
+   - Clear steps to reproduce
+   - Expected vs actual behavior
+   - Error messages if any
+
+### Join as a Contributor
+
+We welcome contributions! Here's how to get started:
+
+1. Star ⭐ and watch 👀 the repository
+2. Check [open issues](https://github.com/mguptahub/nanodns/issues) for tasks labeled `good first issue` or `help wanted`
+3. Read our [Contributing Guide](CONTRIBUTING.md) for:
+   - Development setup
+   - Code style guidelines
+   - PR process
+   - Release workflow
+
+### Community
+
+- Star the repository to show support
+- Watch for updates and new releases
+- Join discussions in issues and PRs
+- Share your use cases and feedback
+
+## Contributing
+
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
+- Development setup
+- How to create PRs
+- Code style guidelines
+- Release process
