@@ -17,6 +17,9 @@
   <a href="go.mod">
     <img src="https://img.shields.io/github/go-mod/go-version/mguptahub/nanodns" alt="Go Version" />
   </a>
+  <a href="go.mod">
+    <img src="https://goreportcard.com/badge/github.com/mguptahub/nanodns" alt="Go Report" />
+  </a>
   <a href="https://www.gnu.org/licenses/agpl-2.0">
     <img src="https://img.shields.io/badge/License-AGPL%20v2-blue.svg" alt="License: AGPL v2" />
   </a>
