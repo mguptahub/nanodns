@@ -98,6 +98,9 @@
             max-width: 600px;
             margin: 0 auto 2rem;
         }
+        .hero .main-logo{
+            height: 25rem;
+        }
 
         .container {
             max-width: 1200px;
@@ -312,6 +315,12 @@
         }
 
         @media (max-width: 768px) {
+            .hero {
+                margin-top: 1.5rem;
+            }
+            .hero .main-logo{
+                height: 12rem;
+            }
             .nav-links {
                 display: none;
             }
@@ -343,7 +352,7 @@
     </nav>
 
     <section class="hero">
-        <img src="nanodns.webp" style="height: 25rem;">
+        <img src="nanodns.webp" class="main-logo">
         
         <p>A lightweight DNS server designed for Docker Compose environments, allowing dynamic resolution of service
             names and custom DNS records.</p>
