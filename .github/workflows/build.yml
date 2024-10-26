@@ -1,0 +1,122 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    tags: [ 'v*' ]
+    # branches: [ "master" ]
+  # pull_request:
+  #   branches: [ "master" ]
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  GO_VERSION: '1.22'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ env.GO_VERSION }}
+        cache: true
+    
+    - name: Install dependencies
+      run: go mod download
+
+    - name: Run tests with coverage
+      run: go test -cover ./...
+
+    - name: Build
+      run: go build -v -o nanodns ./cmd/server
+
+  docker:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,format=long
+            type=raw,value=latest,enable={{is_default_branch}}
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Make package public
+        run: |
+          PACKAGE_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+          curl -L \
+            -X PUT \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/orgs/${{ github.repository_owner }}/packages/container/${PACKAGE_NAME}/visibility \
+            -d '{"visibility":"public"}'
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION}}
+          cache: true
+
+      - name: Build Release Binaries
+        run: |
+          GOOS=linux GOARCH=amd64 go build -o nanodns-linux-amd64 ./cmd/server
+          GOOS=linux GOARCH=arm64 go build -o nanodns-linux-arm64 ./cmd/server
+          GOOS=darwin GOARCH=amd64 go build -o nanodns-darwin-amd64 ./cmd/server
+          GOOS=darwin GOARCH=arm64 go build -o nanodns-darwin-arm64 ./cmd/server
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            nanodns-linux-amd64
+            nanodns-linux-arm64
+            nanodns-darwin-amd64
+            nanodns-darwin-arm64
+            scripts/install.sh
+            scripts/uninstall.sh
+          generate_release_notes: true

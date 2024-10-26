@@ -1,0 +1,186 @@
+# Nano DNS Server
+
+A lightweight DNS server designed for Docker Compose environments, allowing dynamic resolution of service names and custom DNS records.
+
+## Features
+
+- Environment variable-based configuration
+- Support for A, CNAME, MX, and TXT records
+- Docker service name resolution
+- Optional TTL configuration (default: 60 seconds)
+- Lightweight and fast
+- Configurable port
+
+## Installation
+
+### Download
+
+Download the latest release from the [releases page](https://github.com/mguptahub/nanodns/releases).
+
+### Platform-specific Instructions
+
+#### Linux Service Installation
+
+Release assets include scripts for installing/uninstalling NanoDNS as a system service:
+
+```bash
+# Make scripts executable
+chmod +x install.sh uninstall.sh
+
+# Install service
+sudo ./install.sh
+
+# View status and logs
+systemctl status nanodns
+journalctl -u nanodns -f
+
+# Edit configuration
+sudo nano /etc/nanodns/nanodns.env
+
+# Uninstall service
+sudo ./uninstall.sh
+```
+
+#### macOS
+
+If you see the warning "Apple could not verify this app", run these commands:
+
+```bash
+# Remove quarantine attribute
+xattr -d com.apple.quarantine nanodns-darwin-arm64
+
+# Make executable
+chmod +x nanodns-darwin-arm64
+
+# Run the binary
+./nanodns-darwin-arm64
+```
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Description | Default | Example |
+|----------|-------------|---------|---------|
+| DNS_PORT | UDP port for DNS server | 53 | 5353 |
+| A_xxx | A Record Details | - | - |
+| CNAME_xxx | CNAME Record Details | - | - |
+| MX_xxx | MX Record Details | - | - |
+| TXT_xxx | TXT Record Details | - | - |
+
+### Record Format
+
+All records use the `|` character as a separator. The general format is:
+```
+RECORD_TYPE_NUMBER=domain|value[|ttl]
+```
+
+### A Records
+```
+A_REC1=domain|ip|ttl
+A_REC2=domain|service:servicename|ttl
+```
+Example:
+```
+A_REC1=app.example.com|192.168.1.10|300
+A_REC2=api.example.com|service:webapp
+```
+
+### CNAME Records
+```
+CNAME_REC1=domain|target|ttl
+```
+Example:
+```
+CNAME_REC1=www.example.com|app.example.com|3600
+```
+
+### MX Records
+```
+MX_REC1=domain|priority|mailserver|ttl
+```
+Example:
+```
+MX_REC1=example.com|10|mail1.example.com|3600
+MX_REC2=example.com|20|mail2.example.com
+```
+
+### TXT Records
+```
+TXT_REC1=domain|"text value"|ttl
+```
+Example:
+```
+TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all|3600
+TXT_REC2=_dmarc.example.com|v=DMARC1; p=reject; rua=mailto:dmarc@example.com
+```
+
+## Docker Compose Usage
+
+```yaml
+name: nanodns
+services:
+  dns:
+    build: .
+    environment:
+      - DNS_PORT=5353  # Optional, defaults to 53
+      # A Records
+      - A_REC1=app.example.com|service:webapp
+      - A_REC2=api.example.com|192.168.1.10|300
+      # TXT Records
+      - TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all
+    ports:
+      - "${DNS_PORT:-5353}:${DNS_PORT:-5353}/udp"  # Uses DNS_PORT if set, otherwise 5353
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+```
+
+## Running Without Docker Compose
+
+```bash
+# Set environment variables
+export DNS_PORT=5353
+export A_REC1=app.example.com|192.168.1.10
+export TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all
+
+# Run the server
+./nanodns
+```
+
+## Testing Records
+
+```bash
+# Test using custom port
+dig @localhost -p 5353 app.example.com A
+
+# Test CNAME record
+dig @localhost -p 5353 www.example.com CNAME
+
+# Test MX record
+dig @localhost -p 5353 example.com MX
+
+# Test TXT record
+dig @localhost -p 5353 example.com TXT
+```
+
+## Common Issues and Solutions
+
+1. Port 53 already in use (common on macOS and Linux):
+   - Use a different port by setting `DNS_PORT=5353` or another available port
+   - Update your client configurations to use the custom port
+
+2. Permission denied when using port 53:
+   - Use a port number above 1024 to avoid requiring root privileges
+   - Set `DNS_PORT=5353` or another high-numbered port
+
+## Development
+
+```bash
+# Build the server
+go build -o nanodns cmd/server/main.go
+
+```

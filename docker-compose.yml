@@ -1,0 +1,41 @@
+name: nanodns
+
+services:
+  dns:
+    build: .
+    environment:
+      - DNS_PORT=5353
+      # A Records (domain|ip[|ttl])
+      - A_REC1=app.example.com|service:webapp
+      - A_REC2=api.example.com|service:api|120
+      - A_REC3=static.example.com|192.168.1.10|300
+      
+      # CNAME Records (domain|target[|ttl])
+      - CNAME_REC1=www.example.com|app.example.com
+      
+      # MX Records (domain|priority|mailserver[|ttl])
+      - MX_REC1=example.com|10|mail1.example.com
+      - MX_REC2=example.com|20|mail2.example.com|3600
+      
+      # TXT Records (domain|"text value"[|ttl])
+      - TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all
+      - TXT_REC2=_dmarc.example.com|v=DMARC1; p=reject; rua=mailto:dmarc@example.com|3600
+      - TXT_REC3=_acme-challenge.example.com|validation-token-here|60
+    ports:
+      - "5353:5353/udp"
+    networks:
+      - app_network
+
+  webapp:
+    image: nginx
+    networks:
+      - app_network
+
+  api:
+    image: node
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
