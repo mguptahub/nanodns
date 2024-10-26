@@ -1,13 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NanoDNS - Lightweight DNS Server for Docker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/zero-md/dist/zero-md.min.js"></script> <!-- Load ZeroMD -->
+    <!-- favicon -->
+    <link rel="icon" href="favicon.png">
     <style>
+        html {
+            scroll-padding-top: 75px;
+            /* Adjusts the scroll position by the height of your navbar */
+            scroll-behavior: smooth;
+        }
+
+        h2 {
+            scroll-margin-top: 75px;
+            /* Adds a margin at the top when an element is scrolled into view */
+        }
+
         :root {
-            --primary: #2563eb;
+            --primary: #1e40af;
             --secondary: #1e40af;
             --text: #1f2937;
             --light: #f3f4f6;
@@ -33,7 +48,7 @@
             top: 0;
             width: 100%;
             background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             z-index: 1000;
             padding: 1rem 0;
         }
@@ -66,9 +81,10 @@
         }
 
         .hero {
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            background: linear-gradient(0deg, #625df580 0%, #1e40af 100%);
+            /* background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); */
             color: white;
-            padding: 4rem 2rem;
+            padding: 2% 2rem;
             text-align: center;
         }
 
@@ -100,8 +116,10 @@
             background: white;
             border-radius: 8px;
             padding: 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 0px 11px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease;
+            text-decoration: none;
+            color: inherit;
         }
 
         .feature-card:hover {
@@ -154,14 +172,15 @@
             padding: 1.5rem;
             border-radius: 8px;
             overflow-x: auto;
-            margin: 1.5rem 0;
+            /* margin: 1.5rem 0; */
         }
 
         .code-tabs {
             border: 1px solid #e5e7eb;
             border-radius: 8px;
             overflow: hidden;
-            margin: 2rem 0;
+            margin: 0;
+            margin-top: 2rem;
         }
 
         .tab-buttons {
@@ -184,7 +203,8 @@
         }
 
         .tab-content {
-            padding: 1.5rem;
+            padding: 1rem;
+            /* padding: 1.5rem; */
         }
 
         .badges {
@@ -192,6 +212,8 @@
             gap: 0.5rem;
             flex-wrap: wrap;
             margin: 1rem 0;
+            justify-content: center;
+            margin-top: 2rem;
         }
 
         .badge {
@@ -207,13 +229,13 @@
 
         .sections {
             display: grid;
-            gap: 4rem;
+            /* gap: 4rem; */
             margin: 4rem 0;
         }
 
         h2 {
             font-size: 2rem;
-            margin-bottom: 1.5rem;
+            /* margin-bottom: 1.5rem; */
             color: var(--text);
         }
 
@@ -256,6 +278,39 @@
             text-decoration: underline;
         }
 
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+
+        .modal-content {
+            position: relative;
+            width: 90%;
+            height: 90%;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            position: fixed;
+            top: 5%;
+            right: 6%;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text);
+            z-index: 1002;
+        }
+
         @media (max-width: 768px) {
             .nav-links {
                 display: none;
@@ -271,14 +326,16 @@
         }
     </style>
 </head>
+
 <body>
     <nav class="navbar">
         <div class="nav-content">
-            <a href="#" class="nav-logo">NanoDNS</a>
+            <a href="#" class="nav-logo">
+                <img src="logo-text.png" alt="NanoDNS" style="height: 40px;">
+            </a>
             <div class="nav-links">
                 <a href="#features">Features</a>
                 <a href="#quickstart">Quick Start</a>
-                <a href="#kubernetes">Kubernetes</a>
                 <a href="#docs">Documentation</a>
                 <a href="https://github.com/mguptahub/nanodns" target="_blank">GitHub</a>
             </div>
@@ -286,30 +343,36 @@
     </nav>
 
     <section class="hero">
-        <h1>NanoDNS</h1>
-        <p>A lightweight DNS server designed for Docker Compose environments, allowing dynamic resolution of service names and custom DNS records.</p>
+        <img src="nanodns.webp" style="height: 25rem;">
+        
+        <p>A lightweight DNS server designed for Docker Compose environments, allowing dynamic resolution of service
+            names and custom DNS records.</p>
         <div class="buttons">
-            <a href="https://github.com/mguptahub/nanodns" class="btn btn-primary"><i class="fab fa-github"></i> View on GitHub</a>
+            <a href="https://github.com/mguptahub/nanodns" class="btn btn-primary" target="_blank"><i
+                    class="fab fa-github"></i> View on
+                GitHub</a>
             <a href="#quickstart" class="btn btn-secondary">Quick Start Guide</a>
         </div>
         <div class="badges">
-            <a href="https://github.com/mguptahub/nanodns/actions/workflows/build.yml" class="badge">
+            <a href="https://github.com/mguptahub/nanodns/actions/workflows/build.yml" target="_blank">
                 <img src="https://github.com/mguptahub/nanodns/actions/workflows/build.yml/badge.svg" alt="Build">
             </a>
-            <a href="https://github.com/mguptahub/nanodns/releases" class="badge">
-                <img src="https://img.shields.io/github/v/release/mguptahub/nanodns?include_prereleases&sort=semver" alt="Release">
+            <a href="https://github.com/mguptahub/nanodns/releases" target="_blank">
+                <img src="https://img.shields.io/github/v/release/mguptahub/nanodns?include_prereleases&sort=semver"
+                    alt="Release">
             </a>
-            <a href="LICENSE" class="badge">
+            <a href="https://github.com/mguptahub/nanodns/blob/main/LICENSE" target="_blank">
                 <img src="https://img.shields.io/badge/License-AGPL%20v2-blue.svg" alt="License">
             </a>
-            <a href="go.mod" class="badge">
+            <a href="https://github.com/mguptahub/nanodns/blob/main/go.mod" target="_blank">
                 <img src="https://img.shields.io/badge/Go-v1.21-blue" alt="Go Version">
             </a>
         </div>
     </section>
 
     <div class="container">
-        <section class="features" id="features">
+        <h2 id="features">Features</h2>
+        <section class="features">
             <div class="feature-card">
                 <div class="feature-icon"><i class="fas fa-cogs"></i></div>
                 <h3>Easy Configuration</h3>
@@ -318,7 +381,8 @@
             <div class="feature-card">
                 <div class="feature-icon"><i class="fab fa-docker"></i></div>
                 <h3>Docker Integration</h3>
-                <p>Seamless integration with Docker and Kubernetes environments. Automatic service discovery and resolution.</p>
+                <p>Seamless integration with Docker and Kubernetes environments. Automatic service discovery and
+                    resolution.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon"><i class="fas fa-tachometer-alt"></i></div>
@@ -331,40 +395,39 @@
             <h2>Quick Start</h2>
             <div class="code-tabs">
                 <div class="tab-buttons">
-                    <button class="tab-btn active">Docker Compose</button>
-                    <button class="tab-btn">Docker Run</button>
+                    <button class="tab-btn active" onclick="showTabContent('docker')">Docker</button>
+                    <button class="tab-btn" onclick="showTabContent('kubernetes')">Kubernetes</button>
                 </div>
-                <div class="tab-content">
-                    <pre>
-services:
-  dns:
-    image: ghcr.io/mguptahub/nanodns:latest
-    environment:
-      - DNS_PORT=5353
-      - A_REC1=app.local|service:webapp
-      - A_REC2=api.local|192.168.1.10
-    ports:
-      - "5353:5353/udp"</pre>
+                <div class="tab-content" id="docker">
+                    <zero-md src="./docker.md"></zero-md>
                 </div>
-            </div>
+                <div class="tab-content" id="kubernetes" style="display: none;">
+                    <zero-md src="./kubernetes.md"></zero-md>
+                </div>
         </section>
 
-        [Additional sections for Kubernetes, Documentation, etc.]
+        <!-- Modal for full-screen content -->
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+                <zero-md id="modalMarkdown"></zero-md>
+            </div>
+        </div>
 
         <section class="sections" id="docs">
             <h2>Documentation</h2>
             <div class="features">
-                <a href="https://github.com/mguptahub/nanodns/blob/main/kubernetes/README.md" class="feature-card">
+                <a href="javascript://" onclick="openModal('../kubernetes/README.md')" class="feature-card">
                     <div class="feature-icon"><i class="fas fa-ship"></i></div>
                     <h3>Kubernetes Guide</h3>
                     <p>Detailed instructions for deploying NanoDNS in Kubernetes environments.</p>
                 </a>
-                <a href="https://github.com/mguptahub/nanodns/blob/main/SECURITY.md" class="feature-card">
+                <a href="javascript://" onclick="openModal('../SECURITY.md')" class="feature-card">
                     <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
                     <h3>Security</h3>
                     <p>Security policy and guidelines for reporting vulnerabilities.</p>
                 </a>
-                <a href="https://github.com/mguptahub/nanodns/blob/main/.github/OSS.md" class="feature-card">
+                <a href="javascript://" onclick="openModal('../.github/OSS.md')" class="feature-card">
                     <div class="feature-icon"><i class="fas fa-code-branch"></i></div>
                     <h3>Contributing</h3>
                     <p>Guidelines for contributing to NanoDNS development.</p>
@@ -381,15 +444,16 @@ services:
             </div>
             <div>
                 <h3>Links</h3>
-                <p><a href="https://github.com/mguptahub/nanodns">GitHub Repository</a></p>
-                <p><a href="https://github.com/mguptahub/nanodns/issues">Issue Tracker</a></p>
-                <p><a href="https://github.com/mguptahub/nanodns/releases">Releases</a></p>
+                <p><a target="_blank" href="https://github.com/mguptahub/nanodns">GitHub Repository</a></p>
+                <p><a target="_blank" href="https://github.com/mguptahub/nanodns/issues">Issue Tracker</a></p>
+                <p><a target="_blank" href="https://github.com/mguptahub/nanodns/releases">Releases</a></p>
             </div>
             <div>
                 <h3>Community</h3>
-                <p><a href="https://github.com/mguptahub/nanodns/discussions">Discussions</a></p>
-                <p><a href="https://github.com/mguptahub/nanodns/blob/main/CONTRIBUTING.md">Contributing</a></p>
-                <p><a href="https://github.com/mguptahub/nanodns/blob/main/SECURITY.md">Security</a></p>
+                <p><a target="_blank" href="https://github.com/mguptahub/nanodns/discussions">Discussions</a></p>
+                <p><a target="_blank"
+                        href="https://github.com/mguptahub/nanodns/blob/main/CONTRIBUTING.md">Contributing</a></p>
+                <p><a target="_blank" href="https://github.com/mguptahub/nanodns/blob/main/SECURITY.md">Security</a></p>
             </div>
         </div>
     </footer>
@@ -402,6 +466,28 @@ services:
                 button.classList.add('active');
             });
         });
+
+        // Function to show tab content
+        function showTabContent(id) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = tab.id === id ? 'block' : 'none';
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent === (id === 'docker-compose' ? 'Docker Compose' : 'Docker Run'));
+            });
+        }
+        // Function to open modal and load the specified markdown file
+        function openModal(mdFile) {
+            document.getElementById("modalMarkdown").setAttribute("src", mdFile);
+            document.getElementById("modalOverlay").style.display = "flex";
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            document.getElementById("modalOverlay").style.display = "none";
+            document.getElementById("modalMarkdown").removeAttribute("src");
+        }
     </script>
 </body>
+
 </html>
