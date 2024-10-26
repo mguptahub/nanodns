@@ -232,3 +232,64 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
 - How to create PRs
 - Code style guidelines
 - Release process
+
+
+## License and Usage Terms
+
+[![License: AGPL v2](https://img.shields.io/badge/License-AGPL%20v2-blue.svg)](https://www.gnu.org/licenses/agpl-2.0)
+
+NanoDNS is open-source software licensed under AGPLv2. This means:
+
+✅ You CAN:
+- Use NanoDNS in your development environment
+- Use NanoDNS as part of your infrastructure
+- Package NanoDNS with your GPL-compatible software (with attribution)
+- Modify and distribute NanoDNS (while keeping it open source)
+
+❌ You CANNOT:
+- Sell NanoDNS as a standalone product
+- Include NanoDNS in proprietary software
+- Remove or modify the license and copyright notices
+
+📝 You MUST:
+- Include the original license
+- State significant changes made
+- Include the complete corresponding source code
+- Include attribution to this repository
+  ```
+  This software uses NanoDNS (https://github.com/mguptahub/nanodns)
+  ```
+
+### Why AGPLv2?
+
+1. **Simplicity**: 
+   - Clearer and more concise terms compared to v3
+   - Well-established legal precedents
+
+2. **Compatibility**: 
+   - Works well with other GPL v2 software
+   - Broader ecosystem compatibility
+
+3. **Core Protection**:
+   - Ensures source code remains open
+   - Prevents commercial exploitation
+   - Requires attribution
+
+### Commercial Usage Notice
+
+While NanoDNS can be used within commercial products as a supporting utility:
+1. The complete source code must be available
+2. Proper attribution must be included
+3. Any modifications must be shared under AGPLv2
+4. It cannot be sold as a standalone product or service
+
+### Proper Attribution
+
+Add this to your documentation:
+```markdown
+This product uses NanoDNS (https://github.com/mguptahub/nanodns), 
+an open-source DNS server licensed under AGPL-2.0.
+```
+
+### Important Note
+If you plan to use NanoDNS in your project, ensure your project's license is compatible with AGPLv2. When in doubt, open an issue for clarification.
