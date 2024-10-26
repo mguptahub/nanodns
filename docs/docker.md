@@ -7,7 +7,6 @@ docker run -d \
   -p 5353:5353/udp \
   -e DNS_PORT=5353 \
   -e "A_REC1=app.example.com|192.168.1.10|300" \
-  -e "A_REC2=api.example.com|service:webapp" \
   -e "TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all" \
   ghcr.io/mguptahub/nanodns:latest
 ```
