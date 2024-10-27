@@ -17,10 +17,17 @@ type RelayClient struct {
 type RelayError struct {
 	Server string
 	Err    error
+	Query  string // DNS query that failed
+	Rcode  int    // DNS response code if available
 }
 
 func (e *RelayError) Error() string {
-	return fmt.Sprintf("relay to %s failed: %v", e.Server, e.Err)
+	if e.Rcode != 0 {
+		return fmt.Sprintf("relay to %s failed for query %s: %v (rcode: %d)",
+			e.Server, e.Query, e.Err, e.Rcode)
+	}
+	return fmt.Sprintf("relay to %s failed for query %s: %v",
+		e.Server, e.Query, e.Err)
 }
 
 // NewRelayClient creates a new RelayClient with the provided configuration.
@@ -46,6 +53,9 @@ const defaultDNSPort = "53"
 // It attempts each nameserver in sequence until a successful response is received.
 // Returns the first successful response or an error if all nameservers fail.
 func (r *RelayClient) Relay(req *dns.Msg) (*dns.Msg, error) {
+	if len(req.Question) == 0 {
+		return nil, fmt.Errorf("empty question in DNS request")
+	}
 	var lastErr error
 
 	for _, ns := range r.config.Nameservers {
@@ -54,21 +64,19 @@ func (r *RelayClient) Relay(req *dns.Msg) (*dns.Msg, error) {
 			ns = ns + ":" + defaultDNSPort
 		}
 
-		if len(req.Question) == 0 {
-			return nil, fmt.Errorf("empty question in DNS request")
-		}
 		log.Printf("relay_attempt: server=%s, query=%s", ns, req.Question[0].Name)
-		response, _, err := r.client.Exchange(req, ns)
+		response, rtt, err := r.client.Exchange(req, ns)
 		if err != nil {
-			log.Printf("Failed to relay to %s: %v", ns, err)
+			log.Printf("relay_failed: server=%s, query=%s, error=%v", ns, req.Question[0].Name, err)
 			lastErr = &RelayError{
 				Server: ns,
 				Err:    err,
+				Query:  req.Question[0].Name,
 			}
 			continue
 		}
 
-		log.Printf("Got response from %s with code: %v", ns, response.Rcode)
+		log.Printf("relay_success: server=%s, query=%s, rcode=%v, rtt=%v", ns, req.Question[0].Name, response.Rcode, rtt)
 		return response, nil
 	}
 
