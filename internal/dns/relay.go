@@ -14,13 +14,21 @@ type RelayClient struct {
 	client *dns.Client
 }
 
-func NewRelayClient(config config.RelayConfig) *RelayClient {
+// NewRelayClient creates a new RelayClient with the provided configuration.
+// It returns an error if the configuration is invalid.
+func NewRelayClient(config config.RelayConfig) (*RelayClient, error) {
+	if config.Timeout <= 0 {
+		return nil, fmt.Errorf("timeout must be positive")
+	}
+	if len(config.Nameservers) == 0 {
+		return nil, fmt.Errorf("at least one nameserver must be configured")
+	}
 	return &RelayClient{
 		config: config,
 		client: &dns.Client{
 			Timeout: config.Timeout,
 		},
-	}
+	}, nil
 }
 
 func (r *RelayClient) Relay(req *dns.Msg) (*dns.Msg, error) {

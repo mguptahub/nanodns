@@ -53,7 +53,7 @@ func TestRelayClient_Relay(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := NewRelayClient(tt.config)
+			client, _ := NewRelayClient(tt.config)
 
 			m := new(dns.Msg)
 			m.SetQuestion(tt.query, tt.qtype)

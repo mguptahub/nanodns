@@ -36,6 +36,9 @@ func GetServiceName(value string) string {
 	return strings.TrimPrefix(value, ServicePrefix)
 }
 
+// GetRelayConfig returns relay configuration based on environment variables.
+// It reads DNS_RELAY_SERVERS for comma-separated upstream nameserver addresses
+// and applies default timeout settings.
 func GetRelayConfig() RelayConfig {
 	config := RelayConfig{
 		Timeout: DefaultTimeout,
@@ -43,7 +46,21 @@ func GetRelayConfig() RelayConfig {
 
 	if servers := os.Getenv("DNS_RELAY_SERVERS"); servers != "" {
 		config.Enabled = true
-		config.Nameservers = strings.Split(servers, ",")
+		// Split and clean nameserver addresses
+		rawServers := strings.Split(servers, ",")
+		config.Nameservers = make([]string, 0, len(rawServers))
+		for _, server := range rawServers {
+			server = strings.TrimSpace(server)
+			if server == "" {
+				continue
+			}
+			config.Nameservers = append(config.Nameservers, server)
+		}
+
+		// Disable relay if no valid nameservers
+		if len(config.Nameservers) == 0 {
+			config.Enabled = false
+		}
 	}
 
 	return config

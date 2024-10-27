@@ -17,7 +17,7 @@ type Handler struct {
 func NewHandler(records map[string][]DNSRecord, relayConfig config.RelayConfig) *Handler {
 	var relay *RelayClient
 	if relayConfig.Enabled {
-		relay = NewRelayClient(relayConfig)
+		relay, _ = NewRelayClient(relayConfig)
 	}
 
 	return &Handler{
@@ -60,6 +60,8 @@ func (h *Handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 
 			// Add answers from relay response
 			m.Answer = append(m.Answer, relayResp.Answer...)
+			m.Ns = append(m.Ns, relayResp.Ns...)
+			m.Extra = append(m.Extra, relayResp.Extra...)
 
 			// If we got answers from relay, we're not authoritative
 			if len(relayResp.Answer) > 0 {

@@ -180,6 +180,13 @@ func TestHandlerWithoutRelay(t *testing.T) {
 				TTL:        300,
 				RecordType: ARecord,
 			},
+			{
+				Domain:     "example.com.",
+				Value:      "mail.example.com.",
+				TTL:        300,
+				RecordType: MXRecord,
+				Priority:   10,
+			},
 		},
 	}
 
@@ -189,21 +196,37 @@ func TestHandlerWithoutRelay(t *testing.T) {
 	}
 	handler := NewHandler(records, relayConfig)
 
-	w := &mockResponseWriter{msgs: make([]*dns.Msg, 0)}
-	r := new(dns.Msg)
-	r.SetQuestion("nonexistent.com.", dns.TypeA)
-
-	handler.ServeDNS(w, r)
-
-	if len(w.msgs) != 1 {
-		t.Fatal("Expected response message")
+	// Test cases for different record types
+	testCases := []struct {
+		name     string
+		qtype    uint16
+		expected bool
+	}{
+		{"A Record", dns.TypeA, true},
+		{"MX Record", dns.TypeMX, true},
+		{"TXT Record", dns.TypeTXT, false},
 	}
 
-	msg := w.msgs[0]
-	if len(msg.Answer) != 0 {
-		t.Error("Expected no answers for nonexistent domain without relay")
-	}
-	if !msg.Authoritative {
-		t.Error("Expected message to be authoritative when relay is disabled")
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			w := &mockResponseWriter{msgs: make([]*dns.Msg, 0)}
+			r := new(dns.Msg)
+			r.SetQuestion("example.com.", tc.qtype)
+
+			handler.ServeDNS(w, r)
+
+			if len(w.msgs) != 1 {
+				t.Fatal("Expected response message")
+			}
+
+			msg := w.msgs[0]
+			hasAnswer := len(msg.Answer) > 0
+			if hasAnswer != tc.expected {
+				t.Errorf("Expected answer presence: %v, got: %v", tc.expected, hasAnswer)
+			}
+			if !msg.Authoritative {
+				t.Error("Expected message to be authoritative when relay is disabled")
+			}
+		})
 	}
 }

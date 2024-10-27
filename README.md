@@ -109,7 +109,7 @@ NanoDNS follows this resolution order:
 
 All records use the `|` character as a separator. The general format is:
 
-```
+```txt
 RECORD_TYPE_NUMBER=domain|value[|ttl]
 ```
 

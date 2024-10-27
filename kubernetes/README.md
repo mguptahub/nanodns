@@ -92,8 +92,9 @@ spec:
           exec:
             command:
             - dig
+            - "+short"
             - "@127.0.0.1"
-            - "app.example.com"
+            - "google.com" # Known domain that requires relay
           initialDelaySeconds: 5
           periodSeconds: 10
         readinessProbe:
