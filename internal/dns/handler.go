@@ -1,21 +1,35 @@
 package dns
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"strings"
 
+	"github.com/mguptahub/nanodns/pkg/config"
 	"github.com/miekg/dns"
 )
 
 type Handler struct {
 	records map[string][]DNSRecord
+	relay   *RelayClient
 }
 
-func NewHandler(records map[string][]DNSRecord) *Handler {
+func NewHandler(records map[string][]DNSRecord, relayConfig config.RelayConfig) (*Handler, error) {
+	var relay *RelayClient
+	if relayConfig.Enabled {
+		// relay, _ = NewRelayClient(relayConfig)
+		var err error
+		relay, err = NewRelayClient(relayConfig)
+		if err != nil {
+			return nil, fmt.Errorf("failed to initialize relay client: %w", err)
+		}
+	}
+
 	return &Handler{
 		records: records,
-	}
+		relay:   relay,
+	}, nil
 }
 
 func (h *Handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
@@ -26,11 +40,45 @@ func (h *Handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	for _, q := range r.Question {
 		log.Printf("Query for %s (type: %v)", q.Name, dns.TypeToString[q.Qtype])
 
+		// Try local records first
 		if recs, exists := h.records[q.Name]; exists {
 			for _, rec := range recs {
 				if answer := h.createAnswer(q, rec); answer != nil {
 					m.Answer = append(m.Answer, answer)
 				}
+			}
+		}
+
+		// If no local records found and relay is enabled, try relay
+		if len(m.Answer) == 0 && h.relay != nil {
+			log.Printf("No local records found for %s, attempting relay", q.Name)
+
+			// Create a new message for just this question
+			relayReq := new(dns.Msg)
+			relayReq.SetQuestion(q.Name, q.Qtype)
+			relayReq.RecursionDesired = true
+
+			relayResp, err := h.relay.Relay(relayReq)
+			if err != nil {
+				log.Printf("Relay failed: %v", err)
+				// Continue with next question without breaking the loop
+				break
+			}
+
+			// Validate relay response
+			if relayResp.Rcode != dns.RcodeSuccess {
+				log.Printf("Relay returned non-success code: %v", dns.RcodeToString[relayResp.Rcode])
+				continue
+			}
+
+			// Add answers from relay response
+			m.Answer = append(m.Answer, relayResp.Answer...)
+			m.Ns = append(m.Ns, relayResp.Ns...)
+			m.Extra = append(m.Extra, relayResp.Extra...)
+
+			// If we got answers from relay, we're not authoritative
+			if len(relayResp.Answer) > 0 {
+				m.Authoritative = false
 			}
 		}
 	}

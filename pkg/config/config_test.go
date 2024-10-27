@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"reflect"
 	"testing"
 )
 
@@ -101,6 +102,89 @@ func TestGetServiceName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := GetServiceName(tt.value); got != tt.want {
 				t.Errorf("GetServiceName() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGetRelayConfig(t *testing.T) {
+	// Save current env and defer restore
+	oldServers := os.Getenv("DNS_RELAY_SERVERS")
+	defer os.Setenv("DNS_RELAY_SERVERS", oldServers)
+
+	tests := []struct {
+		name     string
+		envValue string
+		want     RelayConfig
+	}{
+		{
+			name:     "no servers",
+			envValue: "",
+			want: RelayConfig{
+				Enabled: false,
+				Timeout: DefaultTimeout,
+			},
+		},
+		{
+			name:     "single server",
+			envValue: "8.8.8.8",
+			want: RelayConfig{
+				Enabled:     true,
+				Nameservers: []string{"8.8.8.8"},
+				Timeout:     DefaultTimeout,
+			},
+		},
+		{
+			name:     "multiple servers",
+			envValue: "8.8.8.8,1.1.1.1",
+			want: RelayConfig{
+				Enabled:     true,
+				Nameservers: []string{"8.8.8.8", "1.1.1.1"},
+				Timeout:     DefaultTimeout,
+			},
+		},
+		{
+			name:     "with whitespace",
+			envValue: " 8.8.8.8 , 1.1.1.1 ",
+			want: RelayConfig{
+				Enabled:     true,
+				Nameservers: []string{"8.8.8.8", "1.1.1.1"},
+				Timeout:     DefaultTimeout,
+			},
+		},
+		{
+			name:     "empty entries",
+			envValue: "8.8.8.8,,1.1.1.1,",
+			want: RelayConfig{
+				Enabled:     true,
+				Nameservers: []string{"8.8.8.8", "1.1.1.1"},
+				Timeout:     DefaultTimeout,
+			},
+		},
+		{
+			name:     "invalid ip address",
+			envValue: "256.256.256.256",
+			want: RelayConfig{
+				Enabled: false,
+				Timeout: DefaultTimeout,
+			},
+		},
+		{
+			name:     "malformed input",
+			envValue: "8.8.8.8:53,not.an.ip",
+			want: RelayConfig{
+				Enabled: false,
+				Timeout: DefaultTimeout,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			os.Setenv("DNS_RELAY_SERVERS", tt.envValue)
+			got := GetRelayConfig()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetRelayConfig() = %v, want %v", got, tt.want)
 			}
 		})
 	}

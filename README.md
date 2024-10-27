@@ -91,19 +91,30 @@ chmod +x nanodns-darwin-arm64
 | Variable | Description | Default | Example |
 |----------|-------------|---------|---------|
 | DNS_PORT | UDP port for DNS server | 53 | 5353 |
+| DNS_RELAY_SERVERS | Comma-separated upstream DNS servers | - | 8.8.8.8:53,1.1.1.1:53 |
 | A_xxx | A Record Details | - | - |
 | CNAME_xxx | CNAME Record Details | - | - |
 | MX_xxx | MX Record Details | - | - |
 | TXT_xxx | TXT Record Details | - | - |
 
+### DNS Resolution Strategy
+
+NanoDNS follows this resolution order:
+
+1. Check configured local records first
+2. If no local record found and relay is enabled, forward to upstream DNS servers
+3. Return first successful response from relay servers
+
 ### Record Format
 
 All records use the `|` character as a separator. The general format is:
-```
+
+```txt
 RECORD_TYPE_NUMBER=domain|value[|ttl]
 ```
 
 ### A Records
+
 ```
 A_REC1=domain|ip|ttl
 A_REC2=domain|service:servicename|ttl
@@ -115,6 +126,7 @@ A_REC2=api.example.com|service:webapp
 ```
 
 ### CNAME Records
+
 ```
 CNAME_REC1=domain|target|ttl
 ```
@@ -124,6 +136,7 @@ CNAME_REC1=www.example.com|app.example.com|3600
 ```
 
 ### MX Records
+
 ```
 MX_REC1=domain|priority|mailserver|ttl
 ```
@@ -134,6 +147,7 @@ MX_REC2=example.com|20|mail2.example.com
 ```
 
 ### TXT Records
+
 ```
 TXT_REC1=domain|"text value"|ttl
 ```
@@ -143,15 +157,16 @@ TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all|3600
 TXT_REC2=_dmarc.example.com|v=DMARC1; p=reject; rua=mailto:dmarc@example.com
 ```
 
-
 ## Docker Usage
 
 ### Using Docker Run
+
 ```bash
 docker run -d \
   --name nanodns \
   -p 5353:5353/udp \
   -e DNS_PORT=5353 \
+  -e DNS_RELAY_SERVERS=8.8.8.8:53,1.1.1.1:53 \  # Optional relay configuration
   -e "A_REC1=app.example.com|192.168.1.10|300" \
   -e "A_REC2=api.example.com|service:webapp" \
   -e "TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all" \
@@ -159,20 +174,23 @@ docker run -d \
 ```
 
 ### Using Docker Compose
+
 ```yaml
 name: nanodns
 services:
   dns:
     image: ghcr.io/mguptahub/nanodns:latest
     environment:
+      # DNS Server Configuration
       - DNS_PORT=5353  # Optional, defaults to 53
-      # A Records
+      - DNS_RELAY_SERVERS=8.8.8.8:53,1.1.1.1:53  # Optional relay servers
+
+      # Local Records
       - A_REC1=app.example.com|service:webapp
       - A_REC2=api.example.com|192.168.1.10|300
-      # TXT Records
       - TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all
     ports:
-      - "${DNS_PORT:-5353}:${DNS_PORT:-5353}/udp"  # Uses DNS_PORT if set, otherwise 5353
+      - "${DNS_PORT:-5353}:${DNS_PORT:-5353}/udp"
     networks:
       - app_network
 
@@ -182,6 +200,7 @@ networks:
 ```
 
 ### Kubernetes
+
 For detailed instructions on deploying NanoDNS in Kubernetes, see our [Kubernetes Deployment Guide](kubernetes/README.md).
 
 ## Running Without Docker Compose
@@ -189,6 +208,7 @@ For detailed instructions on deploying NanoDNS in Kubernetes, see our [Kubernete
 ```bash
 # Set environment variables
 export DNS_PORT=5353
+export DNS_RELAY_SERVERS=8.8.8.8:53,1.1.1.1:53
 export A_REC1=app.example.com|192.168.1.10
 export TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all
 
@@ -199,16 +219,15 @@ export TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all
 ## Testing Records
 
 ```bash
-# Test using custom port
+# Test local records
 dig @localhost -p 5353 app.example.com A
 
-# Test CNAME record
+# Test relay resolution (for non-local domains)
+dig @localhost -p 5353 google.com A
+
+# Test other record types
 dig @localhost -p 5353 www.example.com CNAME
-
-# Test MX record
 dig @localhost -p 5353 example.com MX
-
-# Test TXT record
 dig @localhost -p 5353 example.com TXT
 ```
 
@@ -221,6 +240,12 @@ dig @localhost -p 5353 example.com TXT
 2. Permission denied when using port 53:
    - Use a port number above 1024 to avoid requiring root privileges
    - Set `DNS_PORT=5353` or another high-numbered port
+
+3. DNS Relay Issues:
+   - Verify upstream DNS servers are accessible
+   - Check network connectivity to relay servers
+   - Ensure correct format in DNS_RELAY_SERVERS (comma-separated, with ports)
+   - Monitor logs for relay errors
 
 ## Issues and Support
 
@@ -237,7 +262,14 @@ Before opening a new issue:
    - Expected vs actual behavior
    - Error messages if any
 
-### Join as a Contributor
+## Community
+
+- Star the repository to show support
+- Watch for updates and new releases
+- Join discussions in issues and PRs
+- Share your use cases and feedback
+
+## Join as a Contributor
 
 We welcome contributions! Here's how to get started:
 
@@ -248,21 +280,6 @@ We welcome contributions! Here's how to get started:
    - Code style guidelines
    - PR process
    - Release workflow
-
-### Community
-
-- Star the repository to show support
-- Watch for updates and new releases
-- Join discussions in issues and PRs
-- Share your use cases and feedback
-
-## Contributing
-
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
-- Development setup
-- How to create PRs
-- Code style guidelines
-- Release process
 
 
 ## License and Usage Terms

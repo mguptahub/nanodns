@@ -3,7 +3,9 @@ package dns
 import (
 	"net"
 	"testing"
+	"time"
 
+	"github.com/mguptahub/nanodns/pkg/config"
 	"github.com/miekg/dns"
 )
 
@@ -48,7 +50,14 @@ func TestHandler_ServeDNS(t *testing.T) {
 		},
 	}
 
-	handler := NewHandler(records)
+	// Create relay config for testing
+	relayConfig := config.RelayConfig{
+		Enabled:     true,
+		Nameservers: []string{"8.8.8.8:53"},
+		Timeout:     5 * time.Second,
+	}
+
+	handler, _ := NewHandler(records, relayConfig)
 
 	tests := []struct {
 		name           string
@@ -57,9 +66,10 @@ func TestHandler_ServeDNS(t *testing.T) {
 		expectedCount  int
 		expectedType   uint16
 		expectedAnswer string
+		expectRelay    bool
 	}{
 		{
-			name: "A record query",
+			name: "A record query - local",
 			question: dns.Question{
 				Name:   "example.com.",
 				Qtype:  dns.TypeA,
@@ -69,9 +79,10 @@ func TestHandler_ServeDNS(t *testing.T) {
 			expectedCount:  1,
 			expectedType:   dns.TypeA,
 			expectedAnswer: "192.168.1.1",
+			expectRelay:    false,
 		},
 		{
-			name: "CNAME record query",
+			name: "CNAME record query - local",
 			question: dns.Question{
 				Name:   "www.example.com.",
 				Qtype:  dns.TypeCNAME,
@@ -81,9 +92,10 @@ func TestHandler_ServeDNS(t *testing.T) {
 			expectedCount:  1,
 			expectedType:   dns.TypeCNAME,
 			expectedAnswer: "example.com",
+			expectRelay:    false,
 		},
 		{
-			name: "MX record query",
+			name: "MX record query - local",
 			question: dns.Question{
 				Name:   "example.com.",
 				Qtype:  dns.TypeMX,
@@ -93,6 +105,7 @@ func TestHandler_ServeDNS(t *testing.T) {
 			expectedCount:  1,
 			expectedType:   dns.TypeMX,
 			expectedAnswer: "mail.example.com",
+			expectRelay:    false,
 		},
 		{
 			name: "Non-existent domain",
@@ -103,6 +116,7 @@ func TestHandler_ServeDNS(t *testing.T) {
 			},
 			expectedRcode: dns.RcodeSuccess,
 			expectedCount: 0,
+			expectRelay:   true,
 		},
 	}
 
@@ -147,6 +161,71 @@ func TestHandler_ServeDNS(t *testing.T) {
 						t.Errorf("Expected MX record %s, got %s", tt.expectedAnswer, rr.Mx)
 					}
 				}
+
+				if !tt.expectRelay && !msg.Authoritative {
+					t.Error("Expected message to be authoritative for local records")
+				}
+			}
+		})
+	}
+}
+
+// TestHandlerWithoutRelay tests the handler without relay configuration
+func TestHandlerWithoutRelay(t *testing.T) {
+	records := map[string][]DNSRecord{
+		"example.com.": {
+			{
+				Domain:     "example.com.",
+				Value:      "192.168.1.1",
+				TTL:        300,
+				RecordType: ARecord,
+			},
+			{
+				Domain:     "example.com.",
+				Value:      "mail.example.com.",
+				TTL:        300,
+				RecordType: MXRecord,
+				Priority:   10,
+			},
+		},
+	}
+
+	// Create handler without relay
+	relayConfig := config.RelayConfig{
+		Enabled: false,
+	}
+	handler, _ := NewHandler(records, relayConfig)
+
+	// Test cases for different record types
+	testCases := []struct {
+		name     string
+		qtype    uint16
+		expected bool
+	}{
+		{"A Record", dns.TypeA, true},
+		{"MX Record", dns.TypeMX, true},
+		{"TXT Record", dns.TypeTXT, false},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			w := &mockResponseWriter{msgs: make([]*dns.Msg, 0)}
+			r := new(dns.Msg)
+			r.SetQuestion("example.com.", tc.qtype)
+
+			handler.ServeDNS(w, r)
+
+			if len(w.msgs) != 1 {
+				t.Fatal("Expected response message")
+			}
+
+			msg := w.msgs[0]
+			hasAnswer := len(msg.Answer) > 0
+			if hasAnswer != tc.expected {
+				t.Errorf("Expected answer presence: %v, got: %v", tc.expected, hasAnswer)
+			}
+			if !msg.Authoritative {
+				t.Error("Expected message to be authoritative when relay is disabled")
 			}
 		})
 	}

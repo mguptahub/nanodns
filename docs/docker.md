@@ -6,6 +6,7 @@ docker run -d \
   --name nanodns \
   -p 5353:5353/udp \
   -e DNS_PORT=5353 \
+  -e DNS_RELAY_SERVERS=8.8.8.8:53,1.1.1.1:53 \
   -e "A_REC1=app.example.com|192.168.1.10|300" \
   -e "TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all" \
   ghcr.io/mguptahub/nanodns:latest
@@ -20,6 +21,7 @@ services:
     image: ghcr.io/mguptahub/nanodns:latest
     environment:
       - DNS_PORT=5353  # Optional, defaults to 53
+      - DNS_RELAY_SERVERS=8.8.8.8:53,1.1.1.1:53
       # A Records
       - A_REC1=app.example.com|service:webapp
       - A_REC2=api.example.com|192.168.1.10|300
