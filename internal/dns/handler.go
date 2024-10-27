@@ -61,7 +61,8 @@ func (h *Handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 			relayResp, err := h.relay.Relay(relayReq)
 			if err != nil {
 				log.Printf("Relay failed: %v", err)
-				continue
+				// Continue with next question without breaking the loop
+				break
 			}
 
 			// Validate relay response

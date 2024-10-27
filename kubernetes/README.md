@@ -366,7 +366,7 @@ kubectl rollout status deployment/nanodns
 
 ### Resource Management
 
-- Configure appropriate resource requests and limits
+- Configure appropriate resource requests and limits for pods
 - Monitor resource usage
 - Scale replicas based on load
 

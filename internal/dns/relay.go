@@ -54,12 +54,17 @@ func (r *RelayClient) Relay(req *dns.Msg) (*dns.Msg, error) {
 			ns = ns + ":" + defaultDNSPort
 		}
 
-		// log.Printf("Attempting relay to %s", ns)
+		if len(req.Question) == 0 {
+			return nil, fmt.Errorf("empty question in DNS request")
+		}
 		log.Printf("relay_attempt: server=%s, query=%s", ns, req.Question[0].Name)
 		response, _, err := r.client.Exchange(req, ns)
 		if err != nil {
 			log.Printf("Failed to relay to %s: %v", ns, err)
-			lastErr = err
+			lastErr = &RelayError{
+				Server: ns,
+				Err:    err,
+			}
 			continue
 		}
 
@@ -67,10 +72,5 @@ func (r *RelayClient) Relay(req *dns.Msg) (*dns.Msg, error) {
 		return response, nil
 	}
 
-	// if lastErr != nil {
-	// 	return nil, fmt.Errorf("all nameservers failed, last error: %v", lastErr)
-	// }
-
-	// return nil, fmt.Errorf("no nameservers configured")
 	return nil, fmt.Errorf("all nameservers failed, last error: %v", lastErr)
 }
