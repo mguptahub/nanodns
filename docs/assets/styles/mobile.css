@@ -1,0 +1,22 @@
+@media (max-width: 768px) {
+    .hero {
+        margin-top: 1.5rem;
+    }
+    .hero .main-logo{
+        height: 12rem;
+    }
+    .nav-content{
+        justify-content: center;
+    }
+    .nav-links {
+        display: none;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .buttons {
+        flex-direction: column;
+    }
+}
