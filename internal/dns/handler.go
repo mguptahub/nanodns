@@ -1,6 +1,7 @@
 package dns
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"strings"
@@ -14,16 +15,21 @@ type Handler struct {
 	relay   *RelayClient
 }
 
-func NewHandler(records map[string][]DNSRecord, relayConfig config.RelayConfig) *Handler {
+func NewHandler(records map[string][]DNSRecord, relayConfig config.RelayConfig) (*Handler, error) {
 	var relay *RelayClient
 	if relayConfig.Enabled {
-		relay, _ = NewRelayClient(relayConfig)
+		// relay, _ = NewRelayClient(relayConfig)
+		var err error
+		relay, err = NewRelayClient(relayConfig)
+		if err != nil {
+			return nil, fmt.Errorf("failed to initialize relay client: %w", err)
+		}
 	}
 
 	return &Handler{
 		records: records,
 		relay:   relay,
-	}
+	}, nil
 }
 
 func (h *Handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
@@ -55,6 +61,12 @@ func (h *Handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 			relayResp, err := h.relay.Relay(relayReq)
 			if err != nil {
 				log.Printf("Relay failed: %v", err)
+				continue
+			}
+
+			// Validate relay response
+			if relayResp.Rcode != dns.RcodeSuccess {
+				log.Printf("Relay returned non-success code: %v", dns.RcodeToString[relayResp.Rcode])
 				continue
 			}
 

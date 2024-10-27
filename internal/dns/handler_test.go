@@ -57,7 +57,7 @@ func TestHandler_ServeDNS(t *testing.T) {
 		Timeout:     5 * time.Second,
 	}
 
-	handler := NewHandler(records, relayConfig)
+	handler, _ := NewHandler(records, relayConfig)
 
 	tests := []struct {
 		name           string
@@ -194,7 +194,7 @@ func TestHandlerWithoutRelay(t *testing.T) {
 	relayConfig := config.RelayConfig{
 		Enabled: false,
 	}
-	handler := NewHandler(records, relayConfig)
+	handler, _ := NewHandler(records, relayConfig)
 
 	// Test cases for different record types
 	testCases := []struct {

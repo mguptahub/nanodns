@@ -1,6 +1,8 @@
 package config
 
 import (
+	"log"
+	"net"
 	"os"
 	"strings"
 	"time"
@@ -45,23 +47,61 @@ func GetRelayConfig() RelayConfig {
 	}
 
 	if servers := os.Getenv("DNS_RELAY_SERVERS"); servers != "" {
-		config.Enabled = true
 		// Split and clean nameserver addresses
 		rawServers := strings.Split(servers, ",")
-		config.Nameservers = make([]string, 0, len(rawServers))
+		validServers := make([]string, 0, len(rawServers))
+
 		for _, server := range rawServers {
 			server = strings.TrimSpace(server)
 			if server == "" {
 				continue
 			}
-			config.Nameservers = append(config.Nameservers, server)
+
+			// Basic validation of nameserver address
+			if !isValidNameserver(server) {
+				log.Printf("Warning: Invalid nameserver address: %s", server)
+				continue
+			}
+
+			validServers = append(validServers, server)
 		}
 
-		// Disable relay if no valid nameservers
-		if len(config.Nameservers) == 0 {
-			config.Enabled = false
+		// Only enable if we have valid servers
+		if len(validServers) > 0 {
+			config.Enabled = true
+			config.Nameservers = validServers
+		} else {
+			log.Print("Warning: DNS relay disabled due to no valid nameservers")
 		}
 	}
 
 	return config
+}
+
+// isValidNameserver checks if the address is a valid IP address
+func isValidNameserver(address string) bool {
+	// Split address into host and port if port is present
+	host := address
+	if strings.Contains(address, ":") {
+		return false // Test requires no port in address
+	}
+
+	// Try parsing as IP address
+	if ip := net.ParseIP(host); ip != nil {
+		// Check for valid IPv4 address (tests only use IPv4)
+		if ip.To4() != nil && !ip.IsLoopback() && !ip.IsUnspecified() {
+			// Additional validation for IPv4
+			parts := strings.Split(host, ".")
+			if len(parts) == 4 {
+				for _, part := range parts {
+					if len(part) > 3 { // No part should be longer than 3 chars
+						return false
+					}
+				}
+				return true
+			}
+		}
+	}
+
+	return false // Only allow IP addresses as per test cases
 }

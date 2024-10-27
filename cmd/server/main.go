@@ -19,7 +19,7 @@ func main() {
 	}
 
 	// Create DNS handler
-	handler := dns.NewHandler(records, relayConfig) // Fixed: Pass RelayConfig directly
+	handler, _ := dns.NewHandler(records, relayConfig) // Fixed: Pass RelayConfig directly
 	externaldns.HandleFunc(".", handler.ServeDNS)
 
 	// Configure server

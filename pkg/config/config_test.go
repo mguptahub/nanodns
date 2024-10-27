@@ -161,6 +161,22 @@ func TestGetRelayConfig(t *testing.T) {
 				Timeout:     DefaultTimeout,
 			},
 		},
+		{
+			name:     "invalid ip address",
+			envValue: "256.256.256.256",
+			want: RelayConfig{
+				Enabled: false,
+				Timeout: DefaultTimeout,
+			},
+		},
+		{
+			name:     "malformed input",
+			envValue: "8.8.8.8:53,not.an.ip",
+			want: RelayConfig{
+				Enabled: false,
+				Timeout: DefaultTimeout,
+			},
+		},
 	}
 
 	for _, tt := range tests {

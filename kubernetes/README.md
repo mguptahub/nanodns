@@ -94,7 +94,7 @@ spec:
             - dig
             - "+short"
             - "@127.0.0.1"
-            - "google.com" # Known domain that requires relay
+            - "app.example.com" # Use local record for basic health check
           initialDelaySeconds: 5
           periodSeconds: 10
         readinessProbe:
