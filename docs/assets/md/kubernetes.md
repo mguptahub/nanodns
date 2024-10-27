@@ -10,6 +10,7 @@ data:
   # DNS Server Configuration
   DNS_PORT: "53"
   DNS_RELAY_SERVERS: 8.8.8.8:53,1.1.1.1:53
+  DNS_API_TOKEN: your-secure-token
 
   # A Records
   A_REC1: "app.example.com|service:frontend.default.svc.cluster.local"

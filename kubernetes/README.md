@@ -32,6 +32,7 @@ data:
   DNS_PORT: "53"
   # Relay Configuration - for unmatched queries
   DNS_RELAY_SERVERS: "8.8.8.8:53,1.1.1.1:53"  # Comma-separated upstream DNS servers
+  DNS_API_TOKEN: your-secure-token
 
   # A Records
   A_REC1: "app.example.com|service:frontend.default.svc.cluster.local"

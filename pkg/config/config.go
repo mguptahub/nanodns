@@ -4,8 +4,11 @@ import (
 	"log"
 	"net"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 const (
@@ -19,6 +22,37 @@ type RelayConfig struct {
 	Enabled     bool
 	Nameservers []string
 	Timeout     time.Duration
+}
+
+type APIConfig struct {
+	Enabled bool
+	Token   string
+}
+
+func init() {
+	// Load .env file if it exists
+	envFile := os.Getenv("ENV_FILE")
+	if envFile == "" {
+		envFile = ".env"
+	}
+
+	// Try to load from current directory
+	if err := godotenv.Load(envFile); err != nil {
+		// Try to load from executable directory
+		if exe, err := os.Executable(); err == nil {
+			exeDir := filepath.Dir(exe)
+			envPath := filepath.Join(exeDir, envFile)
+			if err := godotenv.Load(envPath); err != nil {
+				// Not finding .env file is OK, will use environment variables
+				log.Printf("Note: No %s file found, using environment variables", envFile)
+			}
+		}
+	}
+}
+
+// LoadEnvFile explicitly loads an environment file
+func LoadEnvFile(path string) error {
+	return godotenv.Load(path)
 }
 
 func GetDNSPort() string {
@@ -36,6 +70,22 @@ func IsServiceRecord(value string) bool {
 // GetServiceName extracts service name from value
 func GetServiceName(value string) string {
 	return strings.TrimPrefix(value, ServicePrefix)
+}
+
+// GetAPIConfig returns API configuration based on environment variables.
+// It reads DNS_API_TOKEN for API configuration.
+func GetAPIConfig() APIConfig {
+	config := APIConfig{}
+
+	if os.Getenv("DNS_API_TOKEN") != "" {
+		config.Enabled = true
+		config.Token = os.Getenv("DNS_API_TOKEN")
+	} else {
+		log.Print("Warning: DNS API disabled due to missing DNS_API_TOKEN")
+		config.Enabled = false
+	}
+
+	return config
 }
 
 // GetRelayConfig returns relay configuration based on environment variables.

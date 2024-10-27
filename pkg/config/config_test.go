@@ -2,9 +2,53 @@ package config
 
 import (
 	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 )
+
+// TestEnvFile tests the .env file loading
+func TestEnvFile(t *testing.T) {
+	// Create temporary test directory
+	tmpDir := t.TempDir()
+
+	// Create test .env file
+	envContent := `
+DNS_PORT=15353
+DNS_API_TOKEN=test-token
+DNS_RELAY_SERVERS=8.8.8.8
+`
+	envPath := filepath.Join(tmpDir, ".env")
+	if err := os.WriteFile(envPath, []byte(envContent), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	// Test loading the env file
+	if err := LoadEnvFile(envPath); err != nil {
+		t.Fatalf("Failed to load test env file: %v", err)
+	}
+
+	// Test configurations
+	tests := []struct {
+		name     string
+		getFunc  func() string
+		expected string
+	}{
+		{
+			name:     "DNS_PORT from env file",
+			getFunc:  GetDNSPort,
+			expected: "15353",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.getFunc(); got != tt.expected {
+				t.Errorf("Got %v, want %v", got, tt.expected)
+			}
+		})
+	}
+}
 
 func TestGetDNSPort(t *testing.T) {
 	// Save current env and defer restore
@@ -23,8 +67,8 @@ func TestGetDNSPort(t *testing.T) {
 		},
 		{
 			name:     "custom port",
-			envValue: "5353",
-			want:     "5353",
+			envValue: "15353",
+			want:     "15353",
 		},
 	}
 
@@ -185,6 +229,65 @@ func TestGetRelayConfig(t *testing.T) {
 			got := GetRelayConfig()
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetRelayConfig() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGetAPIConfig(t *testing.T) {
+	// Save current env and defer restore
+	oldToken := os.Getenv("DNS_API_TOKEN")
+	defer func() {
+		os.Setenv("DNS_API_TOKEN", oldToken)
+	}()
+
+	tests := []struct {
+		name        string
+		enabled     string
+		token       string
+		wantEnabled bool
+		wantToken   string
+	}{
+		{
+			name:        "disabled by default",
+			enabled:     "",
+			token:       "",
+			wantEnabled: false,
+			wantToken:   "",
+		},
+		{
+			name:        "enabled with token",
+			enabled:     "true",
+			token:       "secret-token",
+			wantEnabled: true,
+			wantToken:   "secret-token",
+		},
+		{
+			name:        "enabled without token",
+			enabled:     "true",
+			token:       "",
+			wantEnabled: false,
+			wantToken:   "",
+		},
+		{
+			name:        "explicitly disabled",
+			enabled:     "false",
+			token:       "secret-token",
+			wantEnabled: false,
+			wantToken:   "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			os.Setenv("DNS_API_TOKEN", tt.token)
+
+			got := GetAPIConfig()
+			if got.Enabled != tt.wantEnabled {
+				t.Errorf("GetAPIConfig().Enabled = %v, want %v", got.Enabled, tt.wantEnabled)
+			}
+			if got.Token != tt.wantToken {
+				t.Errorf("GetAPIConfig().Token = %v, want %v", got.Token, tt.wantToken)
 			}
 		})
 	}
