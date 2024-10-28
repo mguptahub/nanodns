@@ -50,28 +50,29 @@ func GetRelayConfig() RelayConfig {
 		// Split and clean nameserver addresses
 		rawServers := strings.Split(servers, ",")
 		validServers := make([]string, 0, len(rawServers))
+		hasInvalid := false
 
 		for _, server := range rawServers {
 			server = strings.TrimSpace(server)
+
+			// Skip empty entries
 			if server == "" {
 				continue
-			}
-
-			// Basic validation of nameserver address
-			if !isValidNameserver(server) {
+			} else if !isValidNameserver(server) {
 				log.Printf("Warning: Invalid nameserver address: %s", server)
+				hasInvalid = true
 				continue
 			}
 
 			validServers = append(validServers, server)
 		}
 
-		// Only enable if we have valid servers
-		if len(validServers) > 0 {
+		// Enable only if all provided servers are valid
+		if len(validServers) > 0 && !hasInvalid {
 			config.Enabled = true
 			config.Nameservers = validServers
 		} else {
-			log.Print("Warning: DNS relay disabled due to no valid nameservers")
+			log.Print("Warning: DNS relay disabled due to invalid nameserver entries")
 		}
 	}
 
