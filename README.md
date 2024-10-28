@@ -90,7 +90,7 @@ chmod +x nanodns-darwin-arm64
 
 | Variable | Description | Default | Example |
 |----------|-------------|---------|---------|
-| DNS_PORT | UDP port for DNS server | 53 | 5353 |
+| DNS_PORT | UDP port for DNS server | 53 | 10053 |
 | DNS_RELAY_SERVERS | Comma-separated upstream DNS servers | - | 8.8.8.8:53,1.1.1.1:53 |
 | A_xxx | A Record Details | - | - |
 | CNAME_xxx | CNAME Record Details | - | - |
@@ -121,7 +121,7 @@ A_REC2=domain|service:servicename|ttl
 ```
 Example:
 ```
-A_REC1=app.example.com|192.168.1.10|300
+A_REC1=app.example.com|10.10.0.1|300
 A_REC2=api.example.com|service:webapp
 ```
 
@@ -164,10 +164,10 @@ TXT_REC2=_dmarc.example.com|v=DMARC1; p=reject; rua=mailto:dmarc@example.com
 ```bash
 docker run -d \
   --name nanodns \
-  -p 5353:5353/udp \
-  -e DNS_PORT=5353 \
+  -p 10053:10053/udp \
+  -e DNS_PORT=10053 \
   -e DNS_RELAY_SERVERS=8.8.8.8:53,1.1.1.1:53 \  # Optional relay configuration
-  -e "A_REC1=app.example.com|192.168.1.10|300" \
+  -e "A_REC1=app.example.com|10.10.0.1|300" \
   -e "A_REC2=api.example.com|service:webapp" \
   -e "TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all" \
   ghcr.io/mguptahub/nanodns:latest
@@ -182,15 +182,15 @@ services:
     image: ghcr.io/mguptahub/nanodns:latest
     environment:
       # DNS Server Configuration
-      - DNS_PORT=5353  # Optional, defaults to 53
+      - DNS_PORT=10053  # Optional, defaults to 53
       - DNS_RELAY_SERVERS=8.8.8.8:53,1.1.1.1:53  # Optional relay servers
 
       # Local Records
       - A_REC1=app.example.com|service:webapp
-      - A_REC2=api.example.com|192.168.1.10|300
+      - A_REC2=api.example.com|10.10.0.5|300
       - TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all
     ports:
-      - "${DNS_PORT:-5353}:${DNS_PORT:-5353}/udp"
+      - "${DNS_PORT:-10053}:${DNS_PORT:-10053}/udp"
     networks:
       - app_network
 
@@ -207,9 +207,9 @@ For detailed instructions on deploying NanoDNS in Kubernetes, see our [Kubernete
 
 ```bash
 # Set environment variables
-export DNS_PORT=5353
+export DNS_PORT=10053
 export DNS_RELAY_SERVERS=8.8.8.8:53,1.1.1.1:53
-export A_REC1=app.example.com|192.168.1.10
+export A_REC1=app.example.com|10.10.0.7
 export TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all
 
 # Run the server
@@ -220,26 +220,26 @@ export TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all
 
 ```bash
 # Test local records
-dig @localhost -p 5353 app.example.com A
+dig @localhost -p 10053 app.example.com A
 
 # Test relay resolution (for non-local domains)
-dig @localhost -p 5353 google.com A
+dig @localhost -p 10053 google.com A
 
 # Test other record types
-dig @localhost -p 5353 www.example.com CNAME
-dig @localhost -p 5353 example.com MX
-dig @localhost -p 5353 example.com TXT
+dig @localhost -p 10053 www.example.com CNAME
+dig @localhost -p 10053 example.com MX
+dig @localhost -p 10053 example.com TXT
 ```
 
 ## Common Issues and Solutions
 
 1. Port 53 already in use (common on macOS and Linux):
-   - Use a different port by setting `DNS_PORT=5353` or another available port
+   - Use a different port by setting `DNS_PORT=10053` or another available port
    - Update your client configurations to use the custom port
 
 2. Permission denied when using port 53:
    - Use a port number above 1024 to avoid requiring root privileges
-   - Set `DNS_PORT=5353` or another high-numbered port
+   - Set `DNS_PORT=10053` or another high-numbered port
 
 3. DNS Relay Issues:
    - Verify upstream DNS servers are accessible

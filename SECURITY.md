@@ -152,7 +152,7 @@ Verify the authenticity of releases:
 1. **Local Development**
    ```bash
    # Use non-privileged ports
-   export DNS_PORT=5353
+   export DNS_PORT=10053
 
    # Keep environment files secure
    chmod 600 .env
@@ -191,7 +191,7 @@ Verify the authenticity of releases:
          - no-new-privileges:true
        read_only: true
        environment:
-         - DNS_PORT=5353
+         - DNS_PORT=10053
    ```
 
 2. **Kubernetes**

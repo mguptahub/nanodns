@@ -1,2 +1,6 @@
 nanodns
 .DS_Store
+
+.env
+.env.local
+!.env.example

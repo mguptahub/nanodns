@@ -23,8 +23,8 @@ func TestGetDNSPort(t *testing.T) {
 		},
 		{
 			name:     "custom port",
-			envValue: "5353",
-			want:     "5353",
+			envValue: "10053",
+			want:     "10053",
 		},
 	}
 

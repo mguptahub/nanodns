@@ -52,7 +52,7 @@ DNS_PORT=53
 # DNS Records
 # Format: domain|value|ttl
 # Examples:
-# A_REC1=app.local|192.168.1.10|300
+# A_REC1=app.local|10.10.0.3|300
 # A_REC2=api.local|service:myservice
 # CNAME_REC1=www.local|app.local
 # MX_REC1=local|10|mail.local

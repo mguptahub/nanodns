@@ -36,7 +36,7 @@ data:
   # A Records
   A_REC1: "app.example.com|service:frontend.default.svc.cluster.local"
   A_REC2: "api.example.com|service:backend.default.svc.cluster.local"
-  A_REC3: "static.example.com|192.168.1.10|300"
+  A_REC3: "static.example.com|10.10.0.1|300"
 
   # CNAME Records
   CNAME_REC1: "www.example.com|app.example.com|3600"
@@ -156,7 +156,7 @@ data:
   DNS_RELAY_SERVERS: "8.8.8.8:53,1.1.1.1:53"
 
   # Custom port example
-  DNS_RELAY_SERVERS: "custom.dns.server:5353,8.8.8.8:53"
+  DNS_RELAY_SERVERS: "custom.dns.server:10053,8.8.8.8:53"
 ```
 
 When using multiple servers:
@@ -178,7 +178,7 @@ kubectl patch configmap nanodns-config --type merge -p '
 {
   "data": {
     "A_REC1": "app.example.com|service:frontend.default.svc.cluster.local",
-    "A_REC2": "api.example.com|192.168.1.10|300"
+    "A_REC2": "api.example.com|10.10.0.2|300"
   }
 }'
 ```
@@ -202,7 +202,7 @@ kubectl rollout status deployment/nanodns
 A_REC1: "app.example.com|service:frontend.default.svc.cluster.local"
 
 # External IP with TTL
-A_REC2: "api.example.com|192.168.1.10|300"
+A_REC2: "api.example.com|25.35.45.55|300"
 
 # Simple internal IP
 A_REC3: "internal.example.com|10.0.0.50"
