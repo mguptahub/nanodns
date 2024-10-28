@@ -1,7 +1,7 @@
 <h1 align="center">Nano DNS Server</h1>
 
 <p align="center">
-  A lightweight DNS server designed for Docker Compose environments, allowing dynamic resolution of service names and custom DNS records.
+  An ultra-lightweight DNS server that runs anywhere - from Docker containers to Kubernetes pods to Linux services. Perfect for internal networks and ISVs distributing self-hosted applications, it provides custom domain resolution and service discovery without databases or external dependencies.
 </p>
 
 <p align="center">
@@ -155,6 +155,29 @@ Example:
 ```
 TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all|3600
 TXT_REC2=_dmarc.example.com|v=DMARC1; p=reject; rua=mailto:dmarc@example.com
+```
+
+## Sample `.env` file
+
+```ini
+
+# Basic Configuration
+DNS_PORT=10053
+DNS_RELAY_SERVERS=8.8.8.8:53,1.1.1.1:53
+DNS_DEFAULT_TTL=60
+
+# A Records
+A_REC1=domain|ip-addr|[ttl]
+
+# CNAME Records
+# ...
+
+# MX Records
+# ...
+
+# TXT Records
+# ...
+
 ```
 
 ## Docker Usage
