@@ -83,7 +83,8 @@ func isValidNameserver(address string) bool {
 	// Split address into host and port if port is present
 	host := address
 	if strings.Contains(address, ":") {
-		return false // Test requires no port in address
+		parts := strings.Split(address, ":")
+		host = parts[0]
 	}
 
 	// Try parsing as IP address
