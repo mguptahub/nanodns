@@ -323,6 +323,10 @@ h2 {
     margin-bottom: 1rem;
 }
 
+.dark-theme .feature-icon {
+    color: var(--text-secondary);
+}
+
 .feature-card h3 {
     margin-bottom: 1rem;
     color: var(--text-primary);
