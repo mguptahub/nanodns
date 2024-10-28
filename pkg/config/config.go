@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 const (
@@ -19,6 +21,15 @@ type RelayConfig struct {
 	Enabled     bool
 	Nameservers []string
 	Timeout     time.Duration
+}
+
+func init() {
+	if err := godotenv.Load(); err != nil {
+		// Only log if file exists but couldn't be loaded
+		if !os.IsNotExist(err) {
+			log.Printf("Error loading .env file: %v", err)
+		}
+	}
 }
 
 func GetDNSPort() string {
