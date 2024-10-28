@@ -151,6 +151,7 @@ body {
     height: auto;
     margin-bottom: 2rem;
     animation: float 6s ease-in-out infinite;
+    border-radius: 3%;
 }
 
 .hero-content {
