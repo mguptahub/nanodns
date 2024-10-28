@@ -32,7 +32,7 @@
 
 ## Features
 
-- Environment variable-based configuration
+- Environment variable-based configuration (Support .env file)
 - Support for A, CNAME, MX, and TXT records
 - Docker service name resolution
 - Optional TTL configuration (default: 60 seconds)
