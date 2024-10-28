@@ -51,7 +51,7 @@ func (h *Handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	m := new(dns.Msg)
 	m.SetReply(r)
 	m.Authoritative = true
-	m.Compress = true // Enable message compression
+	m.Compress = true
 
 	for _, q := range r.Question {
 		log.Printf("Query for %s (type: %v)", q.Name, dns.TypeToString[q.Qtype])
@@ -60,14 +60,20 @@ func (h *Handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		matchingRecords := h.findMatchingRecords(q.Name)
 		log.Printf("Found %d matching records for %s", len(matchingRecords), q.Name)
 
-		answers := h.processRecords(q, matchingRecords)
-		if len(answers) > 0 {
-			m.Answer = append(m.Answer, answers...)
-			log.Printf("Added %d answers for %s", len(answers), q.Name)
-			continue // Skip relay if we have local answers
+		// Domain exists (found matching records)
+		if len(matchingRecords) > 0 {
+			answers := h.processRecords(q, matchingRecords)
+			if len(answers) > 0 {
+				m.Answer = append(m.Answer, answers...)
+				log.Printf("Added %d answers for %s", len(answers), q.Name)
+				continue // Skip relay if we have local answers
+			}
+			// Domain exists but no matching record type - return NOERROR with no answers
+			m.Rcode = dns.RcodeSuccess
+			continue
 		}
 
-		// If no local records found and relay is enabled, try relay
+		// Domain doesn't exist locally - try relay if enabled
 		if h.relay != nil {
 			log.Printf("No local records found for %s, attempting relay", q.Name)
 
@@ -78,12 +84,18 @@ func (h *Handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 			relayResp, err := h.relay.Relay(relayReq)
 			if err != nil {
 				log.Printf("Relay failed: %v", err)
+				m.Rcode = dns.RcodeNameError // Return NXDOMAIN on relay failure
 				continue
 			}
 
 			if relayResp.Rcode != dns.RcodeSuccess {
 				log.Printf("Relay returned non-success code: %v", dns.RcodeToString[relayResp.Rcode])
-				m.Rcode = relayResp.Rcode
+				// Convert SERVFAIL to NXDOMAIN when appropriate
+				if relayResp.Rcode == dns.RcodeServerFailure {
+					m.Rcode = dns.RcodeNameError
+				} else {
+					m.Rcode = relayResp.Rcode
+				}
 				continue
 			}
 
@@ -94,12 +106,10 @@ func (h *Handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 			if len(relayResp.Answer) > 0 {
 				m.Authoritative = false
 			}
+		} else {
+			// No relay and domain doesn't exist - return NXDOMAIN
+			m.Rcode = dns.RcodeNameError
 		}
-	}
-
-	// Set response code if we have no answers
-	if len(m.Answer) == 0 {
-		m.Rcode = dns.RcodeNameError // NXDOMAIN
 	}
 
 	if err := w.WriteMsg(m); err != nil {

@@ -2,6 +2,7 @@ package dns
 
 import (
 	"net"
+	"strings"
 	"testing"
 	"time"
 
@@ -34,7 +35,7 @@ func TestHandler_ServeDNS(t *testing.T) {
 			},
 			{
 				Domain:     "example.com.",
-				Value:      "mail.example.com",
+				Value:      "mail.example.com.",
 				TTL:        300,
 				RecordType: MXRecord,
 				Priority:   10,
@@ -43,9 +44,25 @@ func TestHandler_ServeDNS(t *testing.T) {
 		"www.example.com.": {
 			{
 				Domain:     "www.example.com.",
-				Value:      "example.com",
+				Value:      "example.com.",
 				TTL:        300,
 				RecordType: CNAMERecord,
+			},
+		},
+		"*.example.com.": {
+			{
+				Domain:     "*.example.com.",
+				Value:      "192.168.1.2",
+				TTL:        300,
+				RecordType: ARecord,
+			},
+		},
+		"txt.example.com.": {
+			{
+				Domain:     "txt.example.com.",
+				Value:      "v=spf1 include:_spf.example.com ~all",
+				TTL:        300,
+				RecordType: TXTRecord,
 			},
 		},
 	}
@@ -91,7 +108,7 @@ func TestHandler_ServeDNS(t *testing.T) {
 			expectedRcode:  dns.RcodeSuccess,
 			expectedCount:  1,
 			expectedType:   dns.TypeCNAME,
-			expectedAnswer: "example.com",
+			expectedAnswer: "example.com.",
 			expectRelay:    false,
 		},
 		{
@@ -102,9 +119,22 @@ func TestHandler_ServeDNS(t *testing.T) {
 				Qclass: dns.ClassINET,
 			},
 			expectedRcode:  dns.RcodeSuccess,
-			expectedCount:  1,
+			expectedCount:  2, // Changed: Expecting MX record + A record for MX target
 			expectedType:   dns.TypeMX,
-			expectedAnswer: "mail.example.com",
+			expectedAnswer: "mail.example.com.",
+			expectRelay:    false,
+		},
+		{
+			name: "TXT record query - local",
+			question: dns.Question{
+				Name:   "txt.example.com.",
+				Qtype:  dns.TypeTXT,
+				Qclass: dns.ClassINET,
+			},
+			expectedRcode:  dns.RcodeSuccess,
+			expectedCount:  1,
+			expectedType:   dns.TypeTXT,
+			expectedAnswer: "v=spf1 include:_spf.example.com ~all",
 			expectRelay:    false,
 		},
 		{
@@ -114,7 +144,7 @@ func TestHandler_ServeDNS(t *testing.T) {
 				Qtype:  dns.TypeA,
 				Qclass: dns.ClassINET,
 			},
-			expectedRcode: dns.RcodeSuccess,
+			expectedRcode: dns.RcodeNameError,
 			expectedCount: 0,
 			expectRelay:   true,
 		},
@@ -139,9 +169,11 @@ func TestHandler_ServeDNS(t *testing.T) {
 
 			if len(msg.Answer) != tt.expectedCount {
 				t.Errorf("Expected %d answers, got %d", tt.expectedCount, len(msg.Answer))
+				return
 			}
 
 			if tt.expectedCount > 0 {
+				// Check first answer only (main record)
 				ans := msg.Answer[0]
 				if ans.Header().Rrtype != tt.expectedType {
 					t.Errorf("Expected type %d, got %d", tt.expectedType, ans.Header().Rrtype)
@@ -160,6 +192,11 @@ func TestHandler_ServeDNS(t *testing.T) {
 					if rr.Mx != tt.expectedAnswer {
 						t.Errorf("Expected MX record %s, got %s", tt.expectedAnswer, rr.Mx)
 					}
+				case *dns.TXT:
+					joined := strings.Join(rr.Txt, " ")
+					if joined != tt.expectedAnswer {
+						t.Errorf("Expected TXT record %s, got %s", tt.expectedAnswer, joined)
+					}
 				}
 
 				if !tt.expectRelay && !msg.Authoritative {
@@ -170,7 +207,6 @@ func TestHandler_ServeDNS(t *testing.T) {
 	}
 }
 
-// TestHandlerWithoutRelay tests the handler without relay configuration
 func TestHandlerWithoutRelay(t *testing.T) {
 	records := map[string][]DNSRecord{
 		"example.com.": {
@@ -196,22 +232,25 @@ func TestHandlerWithoutRelay(t *testing.T) {
 	}
 	handler, _ := NewHandler(records, relayConfig)
 
-	// Test cases for different record types
 	testCases := []struct {
-		name     string
-		qtype    uint16
-		expected bool
+		name          string
+		qname         string
+		qtype         uint16
+		expectedRcode int
+		expectAnswer  bool
 	}{
-		{"A Record", dns.TypeA, true},
-		{"MX Record", dns.TypeMX, true},
-		{"TXT Record", dns.TypeTXT, false},
+		{"A Record", "example.com.", dns.TypeA, dns.RcodeSuccess, true},
+		{"MX Record", "example.com.", dns.TypeMX, dns.RcodeSuccess, true},
+		{"TXT Record", "example.com.", dns.TypeTXT, dns.RcodeSuccess, false}, // Changed: when record doesn't exist, return NoError
+		{"Non-existent domain", "nonexistent.com.", dns.TypeA, dns.RcodeNameError, false},
+		{"Non-existent record type", "example.com.", dns.TypeAAAA, dns.RcodeSuccess, false}, // Changed: when record type doesn't exist, return NoError
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			w := &mockResponseWriter{msgs: make([]*dns.Msg, 0)}
 			r := new(dns.Msg)
-			r.SetQuestion("example.com.", tc.qtype)
+			r.SetQuestion(tc.qname, tc.qtype)
 
 			handler.ServeDNS(w, r)
 
@@ -220,9 +259,13 @@ func TestHandlerWithoutRelay(t *testing.T) {
 			}
 
 			msg := w.msgs[0]
+			if msg.Rcode != tc.expectedRcode {
+				t.Errorf("Expected Rcode %d, got %d", tc.expectedRcode, msg.Rcode)
+			}
+
 			hasAnswer := len(msg.Answer) > 0
-			if hasAnswer != tc.expected {
-				t.Errorf("Expected answer presence: %v, got: %v", tc.expected, hasAnswer)
+			if hasAnswer != tc.expectAnswer {
+				t.Errorf("Expected answer presence: %v, got: %v", tc.expectAnswer, hasAnswer)
 			}
 			if !msg.Authoritative {
 				t.Error("Expected message to be authoritative when relay is disabled")
