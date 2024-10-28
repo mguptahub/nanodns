@@ -5,10 +5,9 @@
     --text-secondary: #4b5563;
     --card-bg: #ffffff;
     --nav-bg: rgba(255, 255, 255, 0.9);
-    --code-bg: #1e293b;
     --code-header-bg: #334155;
     --footer-bg: #f8fafc;
-    --border-color: #e5e7eb;
+    --border-color: rgba(255, 255, 255, 0.1);
 
     --header-bg-dark: #0f1729;
     --header-bg-light: #f8fafc;
@@ -34,7 +33,7 @@
     --card-bg: #1e293b;
     --nav-bg: rgba(15, 23, 42, 0.9);
     --footer-bg: #1e293b;
-    --border-color: #2d3748;
+    --border-color: rgba(255, 255, 255, 0.1);
 }
 .dark-theme .navbar {
     background: var(--header-bg-dark);
@@ -287,7 +286,7 @@ body {
     padding: 2rem 1rem;
 }
 
-/* Section Headers */
+Section Headers
 h2 {
     font-size: 2rem;
     margin-bottom: 2rem;
@@ -408,9 +407,10 @@ h2 {
 
 .modal-content {
     background: var(--card-bg);
+    color: var(--text-primary);
     padding: 2rem;
-    border-radius: 1rem;
-    max-width: 800px;
+    border-radius: 0.4rem;
+    max-width: 80%;
     width: 100%;
     max-height: 80vh;
     overflow-y: auto;
@@ -425,6 +425,7 @@ h2 {
     cursor: pointer;
     color: var(--text-secondary);
     transition: color 0.3s;
+    z-index: 1;
 }
 
 .modal-close:hover {
@@ -466,27 +467,3 @@ h2 {
     color: var(--primary-color);
 }
 
-/* Zero-MD Custom Styles */
-zero-md {
-    --md-code-bg: var(--code-bg);
-    --md-code-fg: #e5e7eb;
-}
-
-/* Scrollbar Styles */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--background);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #3451c4;
-}

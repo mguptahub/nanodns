@@ -124,13 +124,28 @@
                 </div>
                 <div class="tab-contents">
                     <div id="docker" class="tab-content active">
-                        <zero-md src="assets/md/docker.md"></zero-md>
+                        <zero-md src="assets/md/docker.md">
+                            <template>
+                                <link rel="stylesheet" href="assets/css/zeromd.css">
+                            </template>
+                            
+                        </zero-md>
                     </div>
                     <div id="kubernetes" class="tab-content">
-                        <zero-md src="assets/md/kubernetes.md"></zero-md>
+                        <zero-md src="assets/md/kubernetes.md">
+                            <template>
+                                <link rel="stylesheet" href="assets/css/zeromd.css">
+                            </template>
+                            
+                        </zero-md>
                     </div>
                     <div id="dotenv" class="tab-content">
-                        <zero-md src="assets/md/env-sample.md"></zero-md>
+                        <zero-md src="assets/md/env-sample.md">
+
+                            <template>
+                                <link rel="stylesheet" href="assets/css/zeromd.css">
+                            </template>
+                        </zero-md>
                     </div>
                 </div>
             </div>
@@ -161,7 +176,11 @@
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal()">&times;</span>
-            <zero-md id="modalMarkdown"></zero-md>
+            <zero-md id="modalMarkdown">
+                <template>
+                    <link rel="stylesheet" href="assets/css/zeromd.css">
+                </template>
+            </zero-md>
         </div>
     </div>
 

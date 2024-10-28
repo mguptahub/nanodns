@@ -1,0 +1,23 @@
+@media (max-width: 768px) {
+
+    h1 {
+        font-size: 1.5em !important;
+    }
+    h2 {
+        font-size: 1.25em !important;
+    }
+    h3 {
+        font-size: 1.10em !important;
+    }
+}
+
+.markdown-body {
+    padding: 0.5rem 1rem !important;
+}
+
+.markdown-body pre[class*=language-] {
+    /* border: 1px solid green !important; */
+    padding: 10px !important;
+    border-radius: 5px !important;
+    backdrop-filter: brightness(0.9);
+}

@@ -1,3 +1,7 @@
+
+### Sample .env file
+
+
 ```bash
 # DNS Server Configuration
 DNS_PORT=10053

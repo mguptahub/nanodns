@@ -1,19 +1,3 @@
-// Wait for DOM to be fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize AOS (Animate On Scroll)
-    AOS.init({
-        duration: 800,
-        once: true,
-        offset: 50
-    });
-
-    initThemeToggle();
-    initTabFunctionality();
-    initModalFunctionality();
-    initSmoothScroll();
-    initScrollSpy();
-});
-
 // Theme Toggle Implementation
 function initThemeToggle() {
     const themeToggle = document.getElementById('themeToggle');
@@ -83,6 +67,7 @@ function initModalFunctionality() {
         document.body.style.position = 'fixed';
         document.body.style.top = `-${currentScroll}px`;
         document.body.style.width = '100%';
+
     };
 
     window.closeModal = function() {
@@ -198,5 +183,36 @@ function initCodeCopy() {
     });
 }
 
+// window.ZeroMD = {
+//     config: {
+//         cssUrls: [
+//             'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css/github-markdown.css'
+//         ],
+//         markedOptions: {
+//             breaks: true,
+//             gfm: true
+//         }
+//     }
+// };
+
 // Initialize code copy functionality when zero-md components are loaded
+
+
 document.addEventListener('zero-md-rendered', initCodeCopy);
+
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS (Animate On Scroll)
+    AOS.init({
+        duration: 800,
+        once: true,
+        offset: 50
+    });
+
+    initThemeToggle();
+    initTabFunctionality();
+    initModalFunctionality();
+    initSmoothScroll();
+    initScrollSpy();
+});
+
