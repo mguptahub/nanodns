@@ -84,12 +84,16 @@
                 <div class="tab-buttons">
                     <button class="tab-btn active" onclick="showTabContent('docker')">Docker</button>
                     <button class="tab-btn" onclick="showTabContent('kubernetes')">Kubernetes</button>
+                    <button class="tab-btn" onclick="showTabContent('dotenv')">Sample .env </button>
                 </div>
                 <div class="tab-content" id="docker">
                     <zero-md src="assets/md/docker.md"></zero-md>
                 </div>
                 <div class="tab-content" id="kubernetes" style="display: none;">
                     <zero-md src="assets/md/kubernetes.md"></zero-md>
+                </div>
+                <div class="tab-content" id="dotenv" style="display: none;">
+                    <zero-md src="assets/md/env-sample.md"></zero-md>
                 </div>
         </section>
 
@@ -160,7 +164,7 @@
                 tab.style.display = tab.id === id ? 'block' : 'none';
             });
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.textContent === (id === 'docker-compose' ? 'Docker Compose' : 'Docker Run'));
+                btn.classList.toggle('active', (btn.id === id))
             });
         }
         // Function to open modal and load the specified markdown file

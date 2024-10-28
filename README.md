@@ -166,10 +166,11 @@ docker run -d \
   --name nanodns \
   -p 10053:10053/udp \
   -e DNS_PORT=10053 \
-  -e DNS_RELAY_SERVERS=8.8.8.8:53,1.1.1.1:53 \  # Optional relay configuration
+  -e DNS_RELAY_SERVERS=8.8.8.8:53,1.1.1.1:53 \
   -e "A_REC1=app.example.com|10.10.0.1|300" \
   -e "A_REC2=api.example.com|service:webapp" \
   -e "TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all" \
+  -v ${PWD}/.env:/app/.env \
   ghcr.io/mguptahub/nanodns:latest
 ```
 
@@ -191,6 +192,8 @@ services:
       - TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all
     ports:
       - "${DNS_PORT:-10053}:${DNS_PORT:-10053}/udp"
+    volumes:
+      - ./.env:/app/.env
     networks:
       - app_network
 
