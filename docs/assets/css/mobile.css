@@ -1,0 +1,253 @@
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0.5rem;
+    }
+
+    .nav-content {
+        padding: 0.5rem;
+    }
+
+    .nav-logo img {
+        height: 32px; /* Slightly smaller logo */
+    }
+
+    .nav-links {
+        gap: 0.75rem;
+    }
+
+    /* Hide text, show only icons for nav items */
+    .nav-link span {
+        display: none;
+    }
+
+    .nav-link {
+        font-size: 1.2rem;
+        padding: 0.5rem;
+    }
+
+    .hero {
+        padding: 5rem 1rem 3rem;
+    }
+
+    .hero-description {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        padding: 0 1rem;
+    }
+
+    .main-logo {
+        width: 140px; /* Slightly smaller logo */
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-features {
+        display: flex;
+        flex-direction: row; /* Keep horizontal on tablets */
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin: 1.5rem 0;
+    }
+
+    .hero-features span {
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
+        background: rgba(74, 108, 247, 0.08);
+        border: 1px solid rgba(74, 108, 247, 0.15);
+        border-radius: 1.5rem;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .hero-features i {
+        font-size: 0.85rem;
+    }
+
+
+    .buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn {
+        font-size: 0.9rem;
+        padding: 0.7rem 1.2rem;
+    }
+
+    .badges {
+        padding: 0.75rem;
+        gap: 0.4rem;
+    }
+
+    .badges img {
+        height: 20px; /* Adjust badge size */
+    }
+
+    .feature-card {
+        padding: 1.5rem;
+    }
+
+    .feature-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .feature-card p {
+        font-size: 0.9rem;
+    }
+
+    .tab-buttons {
+        padding: 0.5rem;
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .modal-content {
+        padding: 1.25rem;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .modal-content h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .modal-content h2 {
+        font-size: 1.25rem;
+        margin: 1.5rem 0 0.75rem;
+    }
+
+    .modal-content h3 {
+        font-size: 1.1rem;
+        margin: 1.25rem 0 0.5rem;
+    }
+
+    .modal-content p, 
+    .modal-content li {
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .modal-content code {
+        font-size: 0.85rem;
+        padding: 0.15rem 0.3rem;
+    }
+
+    .modal-content pre {
+        padding: 0.75rem;
+        margin: 0.75rem 0;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .navbar {
+        padding: 0.25rem;
+    }
+
+    .nav-content {
+        padding: 0.25rem;
+    }
+
+    .nav-links {
+        gap: 0.5rem;
+    }
+
+    .nav-logo img {
+        height: 28px;
+    }
+
+    .hero {
+        padding: 4rem 0.75rem 2rem;
+    }
+
+    .hero-description {
+        font-size: 0.9rem;
+        padding: 0 0.75rem;
+    }
+
+    .main-logo {
+        width: 120px;
+        margin-bottom: 1rem;
+    }
+
+    .hero-content {
+        padding: 0 1rem;
+    }
+
+    .hero-features {
+        padding: 0 0.5rem;
+        gap: 0.5rem;
+    }
+
+    .hero-features span {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .hero-features i {
+        font-size: 0.8rem;
+    }
+
+    .badges {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .tab-buttons {
+        overflow-x: scroll;
+    }
+
+    .btn {
+        font-size: 0.85rem;
+        padding: 0.6rem 1rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .feature-card {
+        padding: 1.25rem;
+    }
+
+    .feature-card h3 {
+        font-size: 1rem;
+    }
+
+    .feature-card p {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .nav-links {
+        gap: 0.25rem;
+    }
+
+    .nav-link {
+        padding: 0.4rem;
+        font-size: 1.1rem;
+    }
+    .hero-description {
+        font-size: 1rem;
+    }
+
+    .feature-card h3 {
+        font-size: 1.2rem;
+    }
+
+    .feature-card p {
+        font-size: 0.95rem;
+    }
+}

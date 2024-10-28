@@ -1,130 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NanoDNS - Lightweight DNS Server</title>
+    
+    <!-- External CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script type="module" src="https://cdn.jsdelivr.net/npm/zero-md/dist/zero-md.min.js"></script> <!-- Load ZeroMD -->
-    <!-- favicon -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/mobile.css">
+    
+    <!-- Favicon -->
     <link rel="icon" href="assets/images/favicon.png">
-    <link rel="stylesheet" href="assets/styles/style.css">
-    <link rel="stylesheet" href="assets/styles/mobile.css">
 </head>
-
 <body>
     <nav class="navbar">
         <div class="nav-content">
             <a href="#" class="nav-logo">
-                <img src="assets/images/logo-text.png" alt="NanoDNS" style="height: 40px;">
+                <img src="assets/images/logo-text.png" alt="NanoDNS">
             </a>
             <div class="nav-links">
-                <a href="#features">Features</a>
-                <a href="#quickstart">Quick Start</a>
-                <a href="#docs">Documentation</a>
-                <a href="https://github.com/mguptahub/nanodns" target="_blank">
-                    <i class="fab fa-github" style="font-size: 1.4rem;"></i>
+                <a href="#features" class="nav-link" title="Features">
+                    <i class="fas fa-star"></i>
+                    <span>Features</span>
                 </a>
+                <a href="#quickstart" class="nav-link" title="Quick Start">
+                    <i class="fas fa-play"></i>
+                    <span>Quick Start</span>
+                </a>
+                <a href="#docs" class="nav-link" title="Documentation">
+                    <i class="fas fa-book"></i>
+                    <span>Documentation</span>
+                </a>
+                <a href="https://github.com/mguptahub/nanodns" 
+                   class="nav-link" 
+                   target="_blank"
+                   title="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+                <button id="themeToggle" 
+                        class="theme-toggle" 
+                        title="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
             </div>
         </div>
     </nav>
 
     <section class="hero">
-        <img src="assets/images/nanodns.webp" class="main-logo">
-        
-        <p>A lightweight DNS server designed for container environments, allowing dynamic resolution of service
-            names and custom DNS records.</p>
-        <div class="buttons">
-            <a href="https://github.com/mguptahub/nanodns" class="btn btn-primary" target="_blank">
-                <i class="fab fa-github"></i> View on
-                GitHub</a>
-            <a href="#quickstart" class="btn btn-secondary">Quick Start Guide</a>
-        </div>
-        <div class="badges">
-            <a href="https://github.com/mguptahub/nanodns/actions/workflows/build.yml" target="_blank">
-                <img src="https://img.shields.io/github/actions/workflow/status/mguptahub/nanodns/build.yml?color=blue&label=Build" alt="Build">
-            </a>
-            <a href="https://github.com/mguptahub/nanodns/releases" target="_blank">
-                <img src="https://img.shields.io/github/v/release/mguptahub/nanodns?include_prereleases&sort=semver&label=Release&color=blue"
-                    alt="Release">
-            </a>
-            <a href="https://github.com/mguptahub/nanodns/blob/main/LICENSE" target="_blank">
-                <img src="https://img.shields.io/github/license/mguptahub/nanodns?label=License&color=blue" alt="License">
-            </a>
-            <a href="https://github.com/mguptahub/nanodns/blob/main/go.mod" target="_blank">
-                <img src="https://img.shields.io/github/go-mod/go-version/mguptahub/nanodns?color=blue" alt="Go Version">
-            </a>
+        <img src="assets/images/nanodns.webp" class="main-logo" alt="NanoDNS Logo">
+        <div class="hero-content">
+            <div class="hero-features">
+                <span><i class="fas fa-feather"></i> Lightweight</span>
+                <span><i class="fas fa-box"></i> Containerized</span>
+                <span><i class="fas fa-rocket"></i> Fast Setup</span>
+            </div>
+            <p class="hero-description">
+                An ultra-lightweight DNS server that runs anywhere - from Docker containers to Kubernetes pods to Linux services. Perfect for internal networks and ISVs distributing self-hosted applications, it provides custom domain resolution and service discovery without databases or external dependencies.
+            </p>
+            <div class="buttons">
+                <a href="https://github.com/mguptahub/nanodns" class="btn btn-primary" target="_blank">
+                    <i class="fab fa-github"></i> View on GitHub
+                </a>
+                <a href="#quickstart" class="btn btn-secondary">
+                    <i class="fas fa-play"></i> Quick Start Guide
+                </a>
+            </div>
+            <div class="badges">
+                <a href="https://github.com/mguptahub/nanodns/actions/workflows/build.yml" target="_blank">
+                    <img src="https://img.shields.io/github/actions/workflow/status/mguptahub/nanodns/build.yml?color=blue&label=Build" alt="Build">
+                </a>
+                <a href="https://github.com/mguptahub/nanodns/releases" target="_blank">
+                    <img src="https://img.shields.io/github/v/release/mguptahub/nanodns?include_prereleases&sort=semver&label=Release&color=blue" alt="Release">
+                </a>
+                <a href="https://github.com/mguptahub/nanodns/blob/main/LICENSE" target="_blank">
+                    <img src="https://img.shields.io/github/license/mguptahub/nanodns?label=License&color=blue" alt="License">
+                </a>
+                <a href="https://github.com/mguptahub/nanodns/blob/main/go.mod" target="_blank">
+                    <img src="https://img.shields.io/github/go-mod/go-version/mguptahub/nanodns?color=blue" alt="Go Version">
+                </a>
+            </div>
         </div>
     </section>
 
     <div class="container">
-        <h2 id="features">Features</h2>
-        <section class="features">
-            <div class="feature-card">
-                <div class="feature-icon"><i class="fas fa-cogs"></i></div>
-                <h3>Easy Configuration</h3>
-                <p>Configure DNS records using simple environment variables. Supports A, CNAME, MX, and TXT records with optional relay DNS.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon"><i class="fas fa-route"></i></div>
-                <h3>Relay DNS</h3>
-                <p>Forward unmatched queries to upstream DNS servers. Support for multiple fallback servers with automatic failover.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon"><i class="fab fa-docker"></i></div>
-                <h3>Docker Integration</h3>
-                <p>Seamless integration with Docker and Kubernetes environments. Automatic service discovery and resolution.</p>
+        <section id="features">
+            <h2>Features</h2>
+            <div class="features">
+                <div class="feature-card" data-aos="fade-up">
+                    <div class="feature-icon"><i class="fas fa-cogs"></i></div>
+                    <h3>Easy Configuration</h3>
+                    <p>Configure DNS records using simple environment variables. Supports A, CNAME, MX, and TXT records with optional relay DNS.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-icon"><i class="fas fa-route"></i></div>
+                    <h3>Relay DNS</h3>
+                    <p>Forward unmatched queries to upstream DNS servers. Support for multiple fallback servers with automatic failover.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-icon"><i class="fab fa-docker"></i></div>
+                    <h3>Docker Integration</h3>
+                    <p>Seamless integration with Docker and Kubernetes environments. Automatic service discovery and resolution.</p>
+                </div>
             </div>
         </section>
 
-        <section class="sections" id="quickstart">
+        <section id="quickstart">
             <h2>Quick Start</h2>
             <div class="code-tabs">
                 <div class="tab-buttons">
-                    <button class="tab-btn active" onclick="showTabContent('docker')">Docker</button>
-                    <button class="tab-btn" onclick="showTabContent('kubernetes')">Kubernetes</button>
-                    <button class="tab-btn" onclick="showTabContent('dotenv')">Sample .env </button>
+                    <button class="tab-btn active" data-tab="docker">
+                        <i class="fab fa-docker"></i> Docker
+                    </button>
+                    <button class="tab-btn" data-tab="kubernetes">
+                        <i class="fas fa-ship"></i> Kubernetes
+                    </button>
+                    <button class="tab-btn" data-tab="dotenv">
+                        <i class="fas fa-file-code"></i> Sample .env
+                    </button>
                 </div>
-                <div class="tab-content" id="docker">
-                    <zero-md src="assets/md/docker.md"></zero-md>
+                <div class="tab-contents">
+                    <div id="docker" class="tab-content active">
+                        <zero-md src="assets/md/docker.md"></zero-md>
+                    </div>
+                    <div id="kubernetes" class="tab-content">
+                        <zero-md src="assets/md/kubernetes.md"></zero-md>
+                    </div>
+                    <div id="dotenv" class="tab-content">
+                        <zero-md src="assets/md/env-sample.md"></zero-md>
+                    </div>
                 </div>
-                <div class="tab-content" id="kubernetes" style="display: none;">
-                    <zero-md src="assets/md/kubernetes.md"></zero-md>
-                </div>
-                <div class="tab-content" id="dotenv" style="display: none;">
-                    <zero-md src="assets/md/env-sample.md"></zero-md>
-                </div>
+            </div>
         </section>
 
-        <!-- Modal for full-screen content -->
-        <div class="modal-overlay" id="modalOverlay">
-            <div class="modal-content">
-                <span class="modal-close" onclick="closeModal()">&times;</span>
-                <zero-md id="modalMarkdown"></zero-md>
-            </div>
-        </div>
-
-        <section class="sections" id="docs">
+        <section id="docs">
             <h2>Documentation</h2>
             <div class="features">
-                <a href="javascript://" onclick="openModal('https://raw.githubusercontent.com/mguptahub/nanodns/refs/heads/main/kubernetes/README.md')" class="feature-card">
+                <a href="javascript:void(0)" onclick="openModal('https://raw.githubusercontent.com/mguptahub/nanodns/refs/heads/main/kubernetes/README.md')" class="feature-card">
                     <div class="feature-icon"><i class="fas fa-ship"></i></div>
                     <h3>Kubernetes Guide</h3>
                     <p>Detailed instructions for deploying NanoDNS in Kubernetes environments.</p>
                 </a>
-                <a href="javascript://" onclick="openModal('https://raw.githubusercontent.com/mguptahub/nanodns/refs/heads/main/SECURITY.md')" class="feature-card">
+                <a href="javascript:void(0)" onclick="openModal('https://raw.githubusercontent.com/mguptahub/nanodns/refs/heads/main/SECURITY.md')" class="feature-card">
                     <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
                     <h3>Security</h3>
                     <p>Security policy and guidelines for reporting vulnerabilities.</p>
                 </a>
-                <a href="javascript://" onclick="openModal('https://raw.githubusercontent.com/mguptahub/nanodns/refs/heads/main/.github/OSS.md')" class="feature-card">
+                <a href="javascript:void(0)" onclick="openModal('https://raw.githubusercontent.com/mguptahub/nanodns/refs/heads/main/.github/OSS.md')" class="feature-card">
                     <div class="feature-icon"><i class="fas fa-code-branch"></i></div>
                     <h3>Contributing</h3>
                     <p>Guidelines for contributing to NanoDNS development.</p>
                 </a>
             </div>
         </section>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <zero-md id="modalMarkdown"></zero-md>
+        </div>
     </div>
 
     <footer class="footer">
@@ -135,50 +173,25 @@
             </div>
             <div>
                 <h3>Links</h3>
-                <p><a target="_blank" href="https://github.com/mguptahub/nanodns">GitHub Repository</a></p>
-                <p><a target="_blank" href="https://github.com/mguptahub/nanodns/issues">Issue Tracker</a></p>
-                <p><a target="_blank" href="https://github.com/mguptahub/nanodns/releases">Releases</a></p>
+                <p><a href="https://github.com/mguptahub/nanodns" target="_blank">GitHub Repository</a></p>
+                <p><a href="https://github.com/mguptahub/nanodns/issues" target="_blank">Issue Tracker</a></p>
+                <p><a href="https://github.com/mguptahub/nanodns/releases" target="_blank">Releases</a></p>
             </div>
             <div>
                 <h3>Community</h3>
-                <p><a target="_blank" href="https://github.com/mguptahub/nanodns/discussions">Discussions</a></p>
-                <p><a target="_blank"
-                        href="https://github.com/mguptahub/nanodns/blob/main/CONTRIBUTING.md">Contributing</a></p>
-                <p><a target="_blank" href="https://github.com/mguptahub/nanodns/blob/main/SECURITY.md">Security</a></p>
+                <p><a href="https://github.com/mguptahub/nanodns/discussions" target="_blank">Discussions</a></p>
+                <p><a href="https://github.com/mguptahub/nanodns/blob/main/CONTRIBUTING.md" target="_blank">Contributing</a></p>
+                <p><a href="https://github.com/mguptahub/nanodns/blob/main/SECURITY.md" target="_blank">Security</a></p>
             </div>
         </div>
     </footer>
 
-    <script>
-        // Simple tab functionality
-        document.querySelectorAll('.tab-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-            });
-        });
-
-        // Function to show tab content
-        function showTabContent(id) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.style.display = tab.id === id ? 'block' : 'none';
-            });
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.toggle('active', (btn.id === id))
-            });
-        }
-        // Function to open modal and load the specified markdown file
-        function openModal(mdFile) {
-            document.getElementById("modalMarkdown").setAttribute("src", mdFile);
-            document.getElementById("modalOverlay").style.display = "flex";
-        }
-
-        // Function to close the modal
-        function closeModal() {
-            document.getElementById("modalOverlay").style.display = "none";
-            document.getElementById("modalMarkdown").removeAttribute("src");
-        }
-    </script>
+    <!-- External JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/zero-md/dist/zero-md.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="assets/js/main.js"></script>
 </body>
-
 </html>
