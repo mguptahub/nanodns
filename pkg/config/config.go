@@ -24,11 +24,18 @@ type RelayConfig struct {
 }
 
 func init() {
-	if err := godotenv.Load(); err != nil {
+	envFile := os.Getenv("ENV_FILE")
+	if envFile == "" {
+		envFile = ".env"
+	}
+
+	if err := godotenv.Load(envFile); err != nil {
 		// Only log if file exists but couldn't be loaded
 		if !os.IsNotExist(err) {
-			log.Printf("Error loading .env file: %v", err)
+			log.Printf("Error loading env file %s: %v", envFile, err)
 		}
+	} else {
+		log.Printf("Successfully loaded env file: %s", envFile)
 	}
 }
 

@@ -147,7 +147,7 @@ body {
 .main-logo {
     position: relative;
     z-index: 1;
-    width: 180px;
+    width: 20rem;
     height: auto;
     margin-bottom: 2rem;
     animation: float 6s ease-in-out infinite;
@@ -467,3 +467,11 @@ h2 {
     color: var(--primary-color);
 }
 
+
+@media (prefers-reduced-motion: reduce) {
+    [data-aos] {
+      transition: none !important;
+      transform: none !important;
+      animation: none !important;
+    }
+}

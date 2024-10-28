@@ -82,14 +82,14 @@ function initModalFunctionality() {
     // Close modal on escape key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && modalOverlay.style.display === 'flex') {
-            closeModal();
+            window.closeModal();
         }
     });
 
     // Close modal when clicking outside
     modalOverlay.addEventListener('click', (e) => {
         if (e.target === modalOverlay) {
-            closeModal();
+            window.closeModal();
         }
     });
 }
@@ -169,6 +169,12 @@ function initCodeCopy() {
         copyButton.addEventListener('click', () => {
             navigator.clipboard.writeText(block.textContent).then(() => {
                 copyButton.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => {
+                    copyButton.innerHTML = '<i class="fas fa-copy"></i>';
+                }, 2000);
+            }).catch((err) => {
+                console.error('Failed to copy text: ', err);
+                copyButton.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
                 setTimeout(() => {
                     copyButton.innerHTML = '<i class="fas fa-copy"></i>';
                 }, 2000);
