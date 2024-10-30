@@ -1,7 +1,7 @@
 <div style="text-align:center; border-bottom:1px solid #444;width:100%;">
 
   <div style="text-align:center; border-bottom:1px solid #444;width:100%;">
-    <img src="docs/assets/images/nanodns.webp" align width="200"/>
+    <img src="./docs/assets/images/nanodns.webp" style="text-align:center;" width="200"/>
   </div>
   <br>
   <p align="center">
