@@ -1,5 +1,6 @@
-<div style="text-align:center; border-bottom:1px solid #444;">
-  <img src="docs/assets/images/nanodns.webp" alt="drawing" width="200"/>
+<div style="text-align:center; border-bottom:1px solid #444;width:100%;">
+
+  <img src="docs/assets/images/nanodns.webp" align width="200"/>
 
   <br>
   <p align="center">
