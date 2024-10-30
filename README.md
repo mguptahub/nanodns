@@ -90,14 +90,26 @@ chmod +x nanodns-darwin-arm64
 
 ### Environment Variables
 
-| Variable | Description | Default | Example |
-|----------|-------------|---------|---------|
-| DNS_PORT | UDP port for DNS server | 53 | 10053 |
-| DNS_RELAY_SERVERS | Comma-separated upstream DNS servers | - | 8.8.8.8:53,1.1.1.1:53 |
-| A_xxx | A Record Details | - | - |
-| CNAME_xxx | CNAME Record Details | - | - |
-| MX_xxx | MX Record Details | - | - |
-| TXT_xxx | TXT Record Details | - | - |
+| Variable | Description | Default |
+|----------|-------------|---------|
+| DNS_PORT | UDP port for DNS server | `10053` |
+| DNS_RELAY_SERVERS | Comma-separated upstream DNS servers | `8.8.8.8:53,1.1.1.1:53` |
+| DNS_DEFAULT_TTL | Default TTL | `60` |
+| LOG_DIR | Log file directory path | `/tmp/log/nanodns` |
+| SERVICE_LOG | Service log filename | `service.log` |
+| ACTION_LOG | Action log filename | `actions.log` |
+| MAX_LOG_SIZE | Max log file size before rotation (in bytes) | `1048576` |
+| MAX_LOG_BACKUPS | Max log file backups before rotation | `5` |
+
+### DNS Records as Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| A_xxx | A Record Details |
+| CNAME_xxx | CNAME Record Details |
+| MX_xxx | MX Record Details |
+| TXT_xxx | TXT Record Details |
+
 
 ### DNS Resolution Strategy
 
