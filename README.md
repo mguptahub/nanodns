@@ -1,34 +1,36 @@
-<h1 align="center">Nano DNS Server</h1>
+<div style="text-align:center; border-bottom:1px solid #444;">
+  <img src="docs/assets/images/nanodns.webp" alt="drawing" width="200"/>
 
-<p align="center">
-  An ultra-lightweight DNS server that runs anywhere - from Docker containers to Kubernetes pods to Linux services. Perfect for internal networks and ISVs distributing self-hosted applications, it provides custom domain resolution and service discovery without databases or external dependencies.
-</p>
+  <br>
+  <p align="center">
+    An ultra-lightweight DNS server that runs anywhere - from Docker containers to Kubernetes pods to Linux services. Perfect for internal networks and ISVs distributing self-hosted applications, it provides custom domain resolution and service discovery without databases or external dependencies.
+  </p>
+  <br>
 
-<p align="center">
-  <a href="https://github.com/mguptahub/nanodns/actions/workflows/build.yml">
-    <img src="https://github.com/mguptahub/nanodns/actions/workflows/build.yml/badge.svg" alt="Build" />
-  </a>
-  <a href="https://github.com/mguptahub/nanodns/releases">
-    <img src="https://img.shields.io/github/v/release/mguptahub/nanodns?sort=semver" alt="Release" />
-  </a>
-  <a href="https://github.com/mguptahub/nanodns/issues">
-    <img src="https://img.shields.io/github/issues/mguptahub/nanodns" alt="Issues" />
-  </a>
-  <a href="go.mod">
-    <img src="https://img.shields.io/github/go-mod/go-version/mguptahub/nanodns" alt="Go Version" />
-  </a>
-  <a href="go.mod">
-    <img src="https://goreportcard.com/badge/github.com/mguptahub/nanodns" alt="Go Report" />
-  </a>
-  <a href="https://www.gnu.org/licenses/agpl-2.0">
-    <img src="https://img.shields.io/badge/License-AGPL%20v2-blue.svg" alt="License: AGPL v2" />
-  </a>
-  <a href="SECURITY.md">
-    <img src="https://img.shields.io/badge/Security-Policy-blue.svg" alt="Security Policy" />
-  </a>
-</p>
-<br>
-<hr>
+  <p align="center">
+    <a href="https://github.com/mguptahub/nanodns/actions/workflows/build.yml">
+      <img src="https://github.com/mguptahub/nanodns/actions/workflows/build.yml/badge.svg" alt="Build" />
+    </a>
+    <a href="https://github.com/mguptahub/nanodns/releases">
+      <img src="https://img.shields.io/github/v/release/mguptahub/nanodns?sort=semver" alt="Release" />
+    </a>
+    <a href="https://github.com/mguptahub/nanodns/issues">
+      <img src="https://img.shields.io/github/issues/mguptahub/nanodns" alt="Issues" />
+    </a>
+    <a href="go.mod">
+      <img src="https://img.shields.io/github/go-mod/go-version/mguptahub/nanodns" alt="Go Version" />
+    </a>
+    <a href="go.mod">
+      <img src="https://goreportcard.com/badge/github.com/mguptahub/nanodns" alt="Go Report" />
+    </a>
+    <a href="https://www.gnu.org/licenses/agpl-2.0">
+      <img src="https://img.shields.io/badge/License-AGPL%20v2-blue.svg" alt="License: AGPL v2" />
+    </a>
+    <a href="SECURITY.md">
+      <img src="https://img.shields.io/badge/Security-Policy-blue.svg" alt="Security Policy" />
+    </a>
+  </p>
+</div>
 
 ## Features
 

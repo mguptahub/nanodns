@@ -23,7 +23,7 @@ type RelayConfig struct {
 	Timeout     time.Duration
 }
 
-func init() {
+func Initialize() {
 	envFile := os.Getenv("ENV_FILE")
 	if envFile == "" {
 		envFile = ".env"
@@ -35,7 +35,7 @@ func init() {
 			log.Printf("Error loading env file %s: %v", envFile, err)
 		}
 	} else {
-		log.Printf("Successfully loaded env file: %s", envFile)
+		// log.Printf("Successfully loaded env file: %s", envFile)
 	}
 }
 
