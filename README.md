@@ -1,8 +1,6 @@
-<div style="text-align:center; border-bottom:1px solid #444;width:100%;">
+<div align="center" style="border-bottom:1px solid #444;width:100%;">
 
-  <div style="text-align:center; border-bottom:1px solid #444;width:100%;">
-    <img src="./docs/assets/images/nanodns.webp" style="text-align:center;" width="200"/>
-  </div>
+  <img src="./docs/assets/images/nanodns.webp" style="text-align:center;" width="200"/>
   <br>
   <p align="center">
     An ultra-lightweight DNS server that runs anywhere - from Docker containers to Kubernetes pods to Linux services. Perfect for internal networks and ISVs distributing self-hosted applications, it provides custom domain resolution and service discovery without databases or external dependencies.
