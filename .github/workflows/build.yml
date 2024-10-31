@@ -4,9 +4,6 @@ on:
   workflow_dispatch:
   push:
     tags: [ 'v*' ]
-    # branches: [ "master" ]
-  # pull_request:
-  #   branches: [ "master" ]
 
 permissions:
   contents: write
@@ -20,6 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Required for getting git information
 
     - name: Set up Go
       uses: actions/setup-go@v4
@@ -27,6 +26,15 @@ jobs:
         go-version: ${{ env.GO_VERSION }}
         cache: true
     
+    - name: Set version
+      id: version
+      run: |
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        fi
+
     - name: Install dependencies
       run: go mod download
 
@@ -34,7 +42,10 @@ jobs:
       run: go test -cover ./...
 
     - name: Build
-      run: go build -v -o nanodns ./cmd/server
+      run: |
+        go build -v \
+          -ldflags="-X main.version=${{ steps.version.outputs.VERSION }}" \
+          -o nanodns ./cmd/server
 
   docker:
     needs: build
@@ -42,6 +53,8 @@ jobs:
     if: github.event_name != 'pull_request'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -55,6 +68,15 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Set version
+        id: version
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          fi
       
       - name: Docker meta
         id: meta
@@ -77,6 +99,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            VERSION=${{ steps.version.outputs.VERSION }}
 
       - name: Make package public
         run: |
@@ -95,6 +119,8 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v4
@@ -102,12 +128,17 @@ jobs:
           go-version: ${{ env.GO_VERSION}}
           cache: true
 
+      - name: Set version
+        id: version
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
       - name: Build Release Binaries
         run: |
-          GOOS=linux GOARCH=amd64 go build -o nanodns-linux-amd64 ./cmd/server
-          GOOS=linux GOARCH=arm64 go build -o nanodns-linux-arm64 ./cmd/server
-          GOOS=darwin GOARCH=amd64 go build -o nanodns-darwin-amd64 ./cmd/server
-          GOOS=darwin GOARCH=arm64 go build -o nanodns-darwin-arm64 ./cmd/server
+          GOOS=linux GOARCH=amd64 go build -ldflags="-X main.version=${{ steps.version.outputs.VERSION }}" -o nanodns-linux-amd64 ./cmd/server
+          GOOS=linux GOARCH=arm64 go build -ldflags="-X main.version=${{ steps.version.outputs.VERSION }}" -o nanodns-linux-arm64 ./cmd/server
+          GOOS=darwin GOARCH=amd64 go build -ldflags="-X main.version=${{ steps.version.outputs.VERSION }}" -o nanodns-darwin-amd64 ./cmd/server
+          GOOS=darwin GOARCH=arm64 go build -ldflags="-X main.version=${{ steps.version.outputs.VERSION }}" -o nanodns-darwin-arm64 ./cmd/server
 
       - name: Create Release
         uses: softprops/action-gh-release@v1

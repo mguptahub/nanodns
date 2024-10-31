@@ -1,9 +1,17 @@
 # Build stage
 FROM golang:1.22-alpine AS builder
+
+# Build args
+ARG VERSION="dev"
+
 WORKDIR /app
 COPY . .
 RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux go build -o nanodns ./cmd/server
+
+# Build with version information
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -ldflags="-X main.version=${VERSION}" \
+    -o nanodns ./cmd/server
 
 # Final stage
 FROM alpine:latest

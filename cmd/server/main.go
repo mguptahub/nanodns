@@ -68,7 +68,6 @@ func init() {
 }
 
 func main() {
-	flag.Parse()
 	if len(os.Args) > 1 {
 		switch flag.Arg(0) {
 		case "start":
@@ -86,11 +85,9 @@ func main() {
 		case "help":
 			flag.Usage()
 			return
-		default:
-			flag.Usage()
-			return
 		}
 	}
+	flag.Parse()
 
 	if showHelp {
 		flag.Usage()
@@ -98,7 +95,9 @@ func main() {
 	}
 
 	if showVersion {
+		fmt.Println("")
 		fmt.Printf("NanoDNS Version: %s\n", version)
+		fmt.Println("")
 		return
 	}
 
