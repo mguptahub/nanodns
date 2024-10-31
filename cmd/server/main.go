@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"strconv"
 	"strings"
 	"syscall"
@@ -13,6 +12,7 @@ import (
 
 	"github.com/mguptahub/nanodns/internal/dns"
 	"github.com/mguptahub/nanodns/internal/logging"
+	"github.com/mguptahub/nanodns/internal/security"
 	"github.com/mguptahub/nanodns/pkg/config"
 	externaldns "github.com/miekg/dns"
 )
@@ -20,15 +20,13 @@ import (
 const pidFilePath = "/tmp/nanodns.pid"
 
 var (
-	version          = "dev" // Default version; can be overridden at build time
-	startService     bool
-	stopService      bool
-	installService   bool
-	uninstallService bool
-	showVersion      bool
-	showHelp         bool
-	showStatus       bool
-	showLogs         bool
+	version      = "dev" // Default version; can be overridden at build time
+	startService bool
+	stopService  bool
+	showVersion  bool
+	showHelp     bool
+	showStatus   bool
+	showLogs     bool
 )
 
 func init() {
@@ -159,7 +157,11 @@ func startDNSServer() {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 
-	defer server.Shutdown()
+	defer func() {
+		if err := server.Shutdown(); err != nil {
+			logging.LogService(fmt.Sprintf("Error during server shutdown: %v", err))
+		}
+	}()
 }
 
 func startDaemon() {
@@ -176,7 +178,11 @@ func startDaemon() {
 		return // Just exit the function
 	}
 
-	cmd := exec.Command(os.Args[0])
+	// cmd := exec.Command(os.Args[0])
+	cmd, err := security.SecureCommand(os.Args[0], os.Args[1:]...)
+	if err != nil {
+		log.Fatalf("Security error: %v", err)
+	}
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setsid: true,
 	}
@@ -191,8 +197,9 @@ func startDaemon() {
 	}
 
 	if err := writePID(cmd.Process.Pid); err != nil {
-		cmd.Process.Kill()
-		logging.LogAction("PID_WRITE_FAILED", fmt.Sprintf("Failed to write PID: %v", err))
+		if err := cmd.Process.Kill(); err != nil {
+			logging.LogAction("PROCESS_KILL_FAILED", fmt.Sprintf("Failed to kill process: %v", err))
+		}
 		log.Fatalf("Failed to write PID: %v", err)
 	}
 

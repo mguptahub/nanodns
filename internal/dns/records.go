@@ -132,7 +132,7 @@ func parseRecord(key, value string) (DNSRecord, error) {
 }
 
 func logLoadedRecords() {
-	log.Println("Loaded DNS Records:")
+	log.Println("Loaded DNS Records")
 	for domain, recs := range records {
 		for _, rec := range recs {
 			var extraInfo string

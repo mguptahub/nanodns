@@ -118,5 +118,4 @@ jobs:
             nanodns-darwin-amd64
             nanodns-darwin-arm64
             scripts/install.sh
-            scripts/uninstall.sh
           generate_release_notes: true

@@ -1,124 +1,176 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Define colors for output
+# install.sh - NanoDNS Installation Script
+
+set -e  # Exit on error
+set -u  # Exit on undefined variable
+
+# Color codes for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Define variables
-SERVICE_NAME="nanodns"
-BINARY_PATH="/usr/local/bin/nanodns"
-SERVICE_PATH="/etc/systemd/system/nanodns.service"
-CONFIG_PATH="/etc/nanodns"
-ENV_FILE="${CONFIG_PATH}/nanodns.env"
+# Configuration
+GITHUB_REPO="mguptahub/nanodns"
+INSTALL_DIR="/usr/local/bin"
+BINARY_NAME="nanodns"
+TEMP_DIR="/tmp/nanodns_install"
 
-# Function to print colored output
-print_status() {
-    local color=$1
-    local message=$2
-    echo -e "${color}${message}${NC}"
+# Print step information
+print_step() {
+    echo -e "${BLUE}==>${NC} $1"
 }
 
-# Check if script is run as root
-if [ "$EUID" -ne 0 ]; then
-    print_status $RED "Please run as root"
+# Print success message
+print_success() {
+    echo -e "${GREEN}==>${NC} $1"
+}
+
+# Print error message and exit
+print_error() {
+    echo -e "${RED}Error:${NC} $1" >&2
     exit 1
+}
+
+# Print warning message
+print_warning() {
+    echo -e "${YELLOW}Warning:${NC} $1"
+}
+
+# Check if command exists
+check_command() {
+    if ! command -v "$1" >/dev/null 2>&1; then
+        print_error "Required command '$1' not found. Please install it first."
+    fi
+}
+
+# Check system requirements
+check_requirements() {
+    print_step "Checking system requirements..."
+    
+    # Check for required commands
+    check_command curl
+    check_command jq
+    check_command grep
+}
+
+# Detect system information
+detect_system() {
+    print_step "Detecting system information..."
+    
+    # Detect OS
+    OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+    
+    # Detect architecture and normalize names
+    local arch=$(uname -m)
+    case $arch in
+        x86_64)  ARCH="amd64" ;;
+        aarch64) ARCH="arm64" ;;
+        *)       print_error "Unsupported architecture: $arch" ;;
+    esac
+    
+    print_success "Detected: $OS-$ARCH"
+}
+
+# Get the latest release URL for current system
+get_download_url() {
+    print_step "Finding latest release..."
+    
+    DOWNLOAD_URL=$(curl -fsSL "https://api.github.com/repos/${GITHUB_REPO}/releases/latest" | \
+                  jq -r '.assets[].browser_download_url' | \
+                  grep "${OS}-${ARCH}$" || true)
+    
+    if [ -z "$DOWNLOAD_URL" ]; then
+        print_error "No release found for ${OS}-${ARCH}"
+    fi
+    
+    print_success "Found release: $DOWNLOAD_URL"
+}
+
+# Download and verify the binary
+download_binary() {
+    print_step "Downloading NanoDNS..."
+    
+    # Create and clean temp directory
+    mkdir -p "$TEMP_DIR"
+    rm -rf "${TEMP_DIR:?}/*"
+    
+    # Download binary
+    local binary_path="${TEMP_DIR}/${BINARY_NAME}"
+    if ! curl -fsSL "$DOWNLOAD_URL" -o "$binary_path"; then
+        print_error "Failed to download binary"
+    fi
+    
+    # Make binary executable
+    chmod +x "$binary_path"
+    
+    print_success "Download completed"
+}
+
+# Install the binary
+install_binary() {
+    print_step "Installing NanoDNS..."
+    
+    # Check if we need sudo
+    local use_sudo=""
+    if [ ! -w "$INSTALL_DIR" ]; then
+        if command -v sudo >/dev/null 2>&1; then
+            use_sudo="sudo"
+        else
+            print_error "Install directory is not writable and sudo is not available"
+        fi
+    fi
+    
+    # Install binary
+    $use_sudo install -m 755 "${TEMP_DIR}/${BINARY_NAME}" "${INSTALL_DIR}/${BINARY_NAME}"
+    
+    # Verify installation
+    if ! command -v $BINARY_NAME >/dev/null 2>&1; then
+        print_error "Installation failed. Binary not found in PATH"
+    fi
+    
+    print_success "Installation completed"
+}
+
+# Verify installation
+verify_installation() {
+    print_step "Verifying installation..."
+    
+    # Check version
+    local version
+    version=$($BINARY_NAME -v 2>&1)
+    print_success "Successfully installed NanoDNS $version"
+}
+
+# Cleanup temporary files
+cleanup() {
+    print_step "Cleaning up..."
+    rm -rf "$TEMP_DIR"
+    print_success "Cleanup completed"
+}
+
+# Main installation process
+main() {
+    echo "NanoDNS Installer"
+    echo "----------------"
+    
+    check_requirements
+    detect_system
+    get_download_url
+    download_binary
+    install_binary
+    verify_installation
+    cleanup
+    
+    echo
+    print_success "NanoDNS has been successfully installed!"
+    echo "Run 'nanodns --help' to get started"
+}
+
+# Run main if script is executed directly (not sourced)
+if [ "${BASH_SOURCE[0]}" -ef "$0" ]; then
+    trap cleanup EXIT
+    main "$@"
 fi
-
-# Create directories
-print_status $YELLOW "Creating directories..."
-mkdir -p "$CONFIG_PATH"
-
-# Copy binary
-print_status $YELLOW "Installing NanoDNS binary..."
-if [ -f "./nanodns" ]; then
-    cp ./nanodns "$BINARY_PATH"
-    chmod +x "$BINARY_PATH"
-else
-    print_status $RED "nanodns binary not found in current directory"
-    exit 1
-fi
-
-# Create environment file if it doesn't exist
-if [ ! -f "$ENV_FILE" ]; then
-    print_status $YELLOW "Creating default environment file..."
-    cat > "$ENV_FILE" << EOF
-# NanoDNS Environment Configuration
-
-# DNS server port (default: 53)
-DNS_PORT=53
-
-# DNS Records
-# Format: domain|value|ttl
-# Examples:
-# A_REC1=app.local|10.10.0.3|300
-# A_REC2=api.local|service:myservice
-# CNAME_REC1=www.local|app.local
-# MX_REC1=local|10|mail.local
-# TXT_REC1=local|v=spf1 include:_spf.google.com ~all
-
-# Add your records below:
-A_REC1=app.local|127.0.0.1|300
-EOF
-fi
-
-# Create systemd service file
-print_status $YELLOW "Creating systemd service..."
-cat > "$SERVICE_PATH" << EOF
-[Unit]
-Description=NanoDNS Server
-After=network.target
-
-[Service]
-Type=simple
-User=root
-EnvironmentFile=${ENV_FILE}
-ExecStart=${BINARY_PATH}
-Restart=always
-RestartSec=10
-StandardOutput=journal
-StandardError=journal
-
-# Security settings
-NoNewPrivileges=true
-ProtectSystem=full
-ProtectHome=true
-PrivateTmp=true
-ProtectKernelTunables=true
-ProtectKernelModules=true
-ProtectControlGroups=true
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-# Set permissions
-print_status $YELLOW "Setting permissions..."
-chmod 644 "$SERVICE_PATH"
-chmod 600 "$ENV_FILE"
-
-# Reload systemd
-print_status $YELLOW "Reloading systemd..."
-systemctl daemon-reload
-
-# Enable and start service
-print_status $YELLOW "Enabling and starting NanoDNS service..."
-systemctl enable nanodns
-systemctl start nanodns
-
-# Check service status
-if systemctl is-active --quiet nanodns; then
-    print_status $GREEN "NanoDNS service has been installed and started successfully!"
-    print_status $GREEN "\nUseful commands:"
-    echo "  Check status: systemctl status nanodns"
-    echo "  View logs: journalctl -u nanodns"
-    echo "  Edit configuration: nano ${ENV_FILE}"
-    echo "  Restart service: systemctl restart nanodns"
-else
-    print_status $RED "Failed to start NanoDNS service. Please check the logs:"
-    echo "  journalctl -u nanodns"
-fi
-
-print_status $YELLOW "\nConfiguration file location: ${ENV_FILE}"
-print_status $YELLOW "Please edit this file to add your DNS records"

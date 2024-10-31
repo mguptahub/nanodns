@@ -1,4 +1,4 @@
-<div align="center" style="border-bottom:1px solid #444;width:100%;">
+<div align="center" style="border-bottom:1px solid #444;width:100%;" alt="NanoDNS Logo">
 
   <img src="./docs/assets/images/nanodns.webp" style="text-align:center;" width="200"/>
   <br>

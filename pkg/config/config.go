@@ -34,8 +34,6 @@ func Initialize() {
 		if !os.IsNotExist(err) {
 			log.Printf("Error loading env file %s: %v", envFile, err)
 		}
-	} else {
-		// log.Printf("Successfully loaded env file: %s", envFile)
 	}
 }
 

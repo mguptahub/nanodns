@@ -253,9 +253,13 @@ func CloseServiceLogFile() error {
 }
 
 func Cleanup() {
-	CloseServiceLogFile()
+	if err := CloseServiceLogFile(); err != nil {
+		fmt.Printf("Error closing service log file: %v\n", err)
+	}
 	if actionFile != nil {
-		actionFile.Close()
+		if err := actionFile.Close(); err != nil {
+			fmt.Printf("Error closing action log file: %v\n", err)
+		}
 		actionFile = nil
 	}
 }
