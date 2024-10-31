@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NanoDNS - Lightweight DNS Server</title>
-    
+
     <!-- External CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
-    
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/mobile.css">
-    
+
     <!-- Favicon -->
     <link rel="icon" href="assets/images/favicon.png">
 </head>
+
 <body id="home">
     <nav class="navbar">
         <div class="nav-content">
@@ -35,17 +37,11 @@
                     <i class="fas fa-book"></i>
                     <span>Documentation</span>
                 </a>
-                <a href="https://github.com/mguptahub/nanodns" 
-                   class="nav-link" 
-                   target="_blank"
-                   title="GitHub">
+                <a href="https://github.com/mguptahub/nanodns" class="nav-link" target="_blank" title="GitHub">
                     <i class="fab fa-github"></i>
                 </a>
-                <button id="themeToggle"
-                        class="theme-toggle"
-                        title="Toggle theme"
-                        aria-label="Toggle dark mode"
-                        aria-pressed="false">
+                <button id="themeToggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle dark mode"
+                    aria-pressed="false">
                     <i class="fas fa-moon" aria-hidden="true"></i>
                 </button>
             </div>
@@ -61,7 +57,9 @@
                 <span><i class="fas fa-rocket"></i> Fast Setup</span>
             </div>
             <p class="hero-description">
-                An ultra-lightweight DNS server that runs anywhere - from Docker containers to Kubernetes pods to Linux services. Perfect for internal networks and ISVs distributing self-hosted applications, it provides custom domain resolution and service discovery without databases or external dependencies.
+                An ultra-lightweight DNS server that runs anywhere - from Docker containers to Kubernetes pods to Linux
+                services. Perfect for internal networks and ISVs distributing self-hosted applications, it provides
+                custom domain resolution and service discovery without databases or external dependencies.
             </p>
             <div class="buttons">
                 <a href="https://github.com/mguptahub/nanodns" class="btn btn-primary" target="_blank">
@@ -73,16 +71,20 @@
             </div>
             <div class="badges">
                 <a href="https://github.com/mguptahub/nanodns/actions/workflows/build.yml" target="_blank">
-                    <img src="https://img.shields.io/github/actions/workflow/status/mguptahub/nanodns/build.yml?color=blue&label=Build" alt="Build">
+                    <img src="https://img.shields.io/github/actions/workflow/status/mguptahub/nanodns/build.yml?color=blue&label=Build"
+                        alt="Build">
                 </a>
                 <a href="https://github.com/mguptahub/nanodns/releases" target="_blank">
-                    <img src="https://img.shields.io/github/v/release/mguptahub/nanodns?include_prereleases&sort=semver&label=Release&color=blue" alt="Release">
+                    <img src="https://img.shields.io/github/v/release/mguptahub/nanodns?include_prereleases&sort=semver&label=Release&color=blue"
+                        alt="Release">
                 </a>
                 <a href="https://github.com/mguptahub/nanodns/blob/main/LICENSE" target="_blank">
-                    <img src="https://img.shields.io/github/license/mguptahub/nanodns?label=License&color=blue" alt="License">
+                    <img src="https://img.shields.io/github/license/mguptahub/nanodns?label=License&color=blue"
+                        alt="License">
                 </a>
                 <a href="https://github.com/mguptahub/nanodns/blob/main/go.mod" target="_blank">
-                    <img src="https://img.shields.io/github/go-mod/go-version/mguptahub/nanodns?color=blue" alt="Go Version">
+                    <img src="https://img.shields.io/github/go-mod/go-version/mguptahub/nanodns?color=blue"
+                        alt="Go Version">
                 </a>
             </div>
         </div>
@@ -95,17 +97,20 @@
                 <div class="feature-card" data-aos="fade-up">
                     <div class="feature-icon"><i class="fas fa-cogs"></i></div>
                     <h3>Easy Configuration</h3>
-                    <p>Configure DNS records using simple environment variables. Supports A, CNAME, MX, and TXT records with optional relay DNS.</p>
+                    <p>Configure DNS records using simple environment variables. Supports A, CNAME, MX, and TXT records
+                        with optional relay DNS.</p>
                 </div>
                 <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
                     <div class="feature-icon"><i class="fas fa-route"></i></div>
                     <h3>Relay DNS</h3>
-                    <p>Forward unmatched queries to upstream DNS servers. Support for multiple fallback servers with automatic failover.</p>
+                    <p>Forward unmatched queries to upstream DNS servers. Support for multiple fallback servers with
+                        automatic failover.</p>
                 </div>
                 <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
                     <div class="feature-icon"><i class="fab fa-docker"></i></div>
                     <h3>Docker Integration</h3>
-                    <p>Seamless integration with Docker and Kubernetes environments. Automatic service discovery and resolution.</p>
+                    <p>Seamless integration with Docker and Kubernetes environments. Automatic service discovery and
+                        resolution.</p>
                 </div>
             </div>
         </section>
@@ -120,6 +125,9 @@
                     <button class="tab-btn" data-tab="kubernetes">
                         <i class="fas fa-ship"></i> Kubernetes
                     </button>
+                    <button class="tab-btn" data-tab="terminal">
+                        <i class="fas fa-ship"></i> Terminal
+                    </button>
                     <button class="tab-btn" data-tab="dotenv">
                         <i class="fas fa-file-code"></i> Sample .env
                     </button>
@@ -130,7 +138,7 @@
                             <template>
                                 <link rel="stylesheet" href="assets/css/zeromd.css">
                             </template>
-                            
+
                         </zero-md>
                     </div>
                     <div id="kubernetes" class="tab-content" style="display: none;">
@@ -138,7 +146,14 @@
                             <template>
                                 <link rel="stylesheet" href="assets/css/zeromd.css">
                             </template>
-                            
+
+                        </zero-md>
+                    </div>
+                    <div id="terminal" class="tab-content" style="display: none;">
+                        <zero-md src="assets/md/terminal.md">
+                            <template>
+                                <link rel="stylesheet" href="assets/css/zeromd.css">
+                            </template>
                         </zero-md>
                     </div>
                     <div id="dotenv" class="tab-content" style="display: none;">
@@ -156,17 +171,23 @@
         <section id="docs">
             <h2>Documentation</h2>
             <div class="features">
-                <a href="javascript:void(0)" onclick="openModal('https://raw.githubusercontent.com/mguptahub/nanodns/refs/heads/main/kubernetes/README.md')" class="feature-card">
+                <a href="javascript:void(0)"
+                    onclick="openModal('https://raw.githubusercontent.com/mguptahub/nanodns/refs/heads/main/kubernetes/README.md')"
+                    class="feature-card">
                     <div class="feature-icon"><i class="fas fa-ship"></i></div>
                     <h3>Kubernetes Guide</h3>
                     <p>Detailed instructions for deploying NanoDNS in Kubernetes environments.</p>
                 </a>
-                <a href="javascript:void(0)" onclick="openModal('https://raw.githubusercontent.com/mguptahub/nanodns/refs/heads/main/SECURITY.md')" class="feature-card">
+                <a href="javascript:void(0)"
+                    onclick="openModal('https://raw.githubusercontent.com/mguptahub/nanodns/refs/heads/main/SECURITY.md')"
+                    class="feature-card">
                     <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
                     <h3>Security</h3>
                     <p>Security policy and guidelines for reporting vulnerabilities.</p>
                 </a>
-                <a href="javascript:void(0)" onclick="openModal('https://raw.githubusercontent.com/mguptahub/nanodns/refs/heads/main/.github/OSS.md')" class="feature-card">
+                <a href="javascript:void(0)"
+                    onclick="openModal('https://raw.githubusercontent.com/mguptahub/nanodns/refs/heads/main/.github/OSS.md')"
+                    class="feature-card">
                     <div class="feature-icon"><i class="fas fa-code-branch"></i></div>
                     <h3>Contributing</h3>
                     <p>Guidelines for contributing to NanoDNS development.</p>
@@ -201,7 +222,8 @@
             <div>
                 <h3>Community</h3>
                 <p><a href="https://github.com/mguptahub/nanodns/discussions" target="_blank">Discussions</a></p>
-                <p><a href="https://github.com/mguptahub/nanodns/blob/main/CONTRIBUTING.md" target="_blank">Contributing</a></p>
+                <p><a href="https://github.com/mguptahub/nanodns/blob/main/CONTRIBUTING.md"
+                        target="_blank">Contributing</a></p>
                 <p><a href="https://github.com/mguptahub/nanodns/blob/main/SECURITY.md" target="_blank">Security</a></p>
             </div>
         </div>
@@ -211,8 +233,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/zero-md/dist/zero-md.min.js"></script>
-    
+
     <!-- Custom JavaScript -->
     <script src="assets/js/main.js"></script>
 </body>
+
 </html>

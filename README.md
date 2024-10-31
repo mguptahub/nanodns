@@ -1,34 +1,36 @@
-<h1 align="center">Nano DNS Server</h1>
+<div align="center" style="border-bottom:1px solid #444;width:100%;" alt="NanoDNS Logo">
 
-<p align="center">
-  An ultra-lightweight DNS server that runs anywhere - from Docker containers to Kubernetes pods to Linux services. Perfect for internal networks and ISVs distributing self-hosted applications, it provides custom domain resolution and service discovery without databases or external dependencies.
-</p>
+  <img src="./docs/assets/images/nanodns.webp" style="text-align:center;" width="200"/>
+  <br>
+  <p align="center">
+    An ultra-lightweight DNS server that runs anywhere - from Docker containers to Kubernetes pods to Linux services. Perfect for internal networks and ISVs distributing self-hosted applications, it provides custom domain resolution and service discovery without databases or external dependencies.
+  </p>
+  <br>
 
-<p align="center">
-  <a href="https://github.com/mguptahub/nanodns/actions/workflows/build.yml">
-    <img src="https://github.com/mguptahub/nanodns/actions/workflows/build.yml/badge.svg" alt="Build" />
-  </a>
-  <a href="https://github.com/mguptahub/nanodns/releases">
-    <img src="https://img.shields.io/github/v/release/mguptahub/nanodns?sort=semver" alt="Release" />
-  </a>
-  <a href="https://github.com/mguptahub/nanodns/issues">
-    <img src="https://img.shields.io/github/issues/mguptahub/nanodns" alt="Issues" />
-  </a>
-  <a href="go.mod">
-    <img src="https://img.shields.io/github/go-mod/go-version/mguptahub/nanodns" alt="Go Version" />
-  </a>
-  <a href="go.mod">
-    <img src="https://goreportcard.com/badge/github.com/mguptahub/nanodns" alt="Go Report" />
-  </a>
-  <a href="https://www.gnu.org/licenses/agpl-2.0">
-    <img src="https://img.shields.io/badge/License-AGPL%20v2-blue.svg" alt="License: AGPL v2" />
-  </a>
-  <a href="SECURITY.md">
-    <img src="https://img.shields.io/badge/Security-Policy-blue.svg" alt="Security Policy" />
-  </a>
-</p>
-<br>
-<hr>
+  <p align="center">
+    <a href="https://github.com/mguptahub/nanodns/actions/workflows/build.yml">
+      <img src="https://github.com/mguptahub/nanodns/actions/workflows/build.yml/badge.svg" alt="Build" />
+    </a>
+    <a href="https://github.com/mguptahub/nanodns/releases">
+      <img src="https://img.shields.io/github/v/release/mguptahub/nanodns?sort=semver" alt="Release" />
+    </a>
+    <a href="https://github.com/mguptahub/nanodns/issues">
+      <img src="https://img.shields.io/github/issues/mguptahub/nanodns" alt="Issues" />
+    </a>
+    <a href="go.mod">
+      <img src="https://img.shields.io/github/go-mod/go-version/mguptahub/nanodns" alt="Go Version" />
+    </a>
+    <a href="go.mod">
+      <img src="https://goreportcard.com/badge/github.com/mguptahub/nanodns" alt="Go Report" />
+    </a>
+    <a href="https://www.gnu.org/licenses/agpl-2.0">
+      <img src="https://img.shields.io/badge/License-AGPL%20v2-blue.svg" alt="License: AGPL v2" />
+    </a>
+    <a href="SECURITY.md">
+      <img src="https://img.shields.io/badge/Security-Policy-blue.svg" alt="Security Policy" />
+    </a>
+  </p>
+</div>
 
 ## Features
 
@@ -88,14 +90,26 @@ chmod +x nanodns-darwin-arm64
 
 ### Environment Variables
 
-| Variable | Description | Default | Example |
-|----------|-------------|---------|---------|
-| DNS_PORT | UDP port for DNS server | 53 | 10053 |
-| DNS_RELAY_SERVERS | Comma-separated upstream DNS servers | - | 8.8.8.8:53,1.1.1.1:53 |
-| A_xxx | A Record Details | - | - |
-| CNAME_xxx | CNAME Record Details | - | - |
-| MX_xxx | MX Record Details | - | - |
-| TXT_xxx | TXT Record Details | - | - |
+| Variable | Description | Default |
+|----------|-------------|---------|
+| DNS_PORT | UDP port for DNS server | `10053` |
+| DNS_RELAY_SERVERS | Comma-separated upstream DNS servers | `8.8.8.8:53,1.1.1.1:53` |
+| DNS_DEFAULT_TTL | Default TTL | `60` |
+| LOG_DIR | Log file directory path | `/tmp/log/nanodns` |
+| SERVICE_LOG | Service log filename | `service.log` |
+| ACTION_LOG | Action log filename | `actions.log` |
+| MAX_LOG_SIZE | Max log file size before rotation (in bytes) | `1048576` |
+| MAX_LOG_BACKUPS | Max log file backups before rotation | `5` |
+
+### DNS Records as Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| A_xxx | A Record Details |
+| CNAME_xxx | CNAME Record Details |
+| MX_xxx | MX Record Details |
+| TXT_xxx | TXT Record Details |
+
 
 ### DNS Resolution Strategy
 
@@ -231,15 +245,57 @@ For detailed instructions on deploying NanoDNS in Kubernetes, see our [Kubernete
 
 ## Running Without Docker Compose
 
+### Set Environment Variables
+
+> You can also use `.env` file with all variables. File must be in same folder as binary
+
 ```bash
-# Set environment variables
+# Set service environment variables
 export DNS_PORT=10053
 export DNS_RELAY_SERVERS=8.8.8.8:53,1.1.1.1:53
+
+# Logging Configuration (optional)
+export LOG_DIR="/tmp/log/nanodns"
+export SERVICE_LOG="service.log"
+export ACTION_LOG="actions.log"
+export MAX_LOG_SIZE=1048576 # 1MB
+export MAX_LOG_BACKUPS=5
+
+# Set DNS Records environment variables
 export A_REC1=app.example.com|10.10.0.7
 export TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all
+```
 
-# Run the server
-./nanodns
+### Start server as daemon
+
+```bash
+./nanodns start
+```
+
+### Start server as current process
+
+```bash
+./nanodns 
+```
+
+### CLI Usage
+
+```bash
+./nanodns --help
+```
+
+```bash
+Usage: nanodns [command | options]
+
+commands:
+  start                              Run the binary as a daemon
+  stop                               Stop the running daemon service
+  status                             Show service status
+  logs                               Show service logs
+
+options:
+  -v | --version                     Show the binary version
+  -a | --action-logs                 Show the action logs. This works with the logs command
 ```
 
 ## Testing Records

@@ -23,8 +23,8 @@ type RelayConfig struct {
 	Timeout     time.Duration
 }
 
-func init() {
-	envFile := os.Getenv("ENV_FILE")
+func Initialize() {
+	envFile := os.Getenv("NANODNS_ENV_FILE")
 	if envFile == "" {
 		envFile = ".env"
 	}
@@ -34,8 +34,6 @@ func init() {
 		if !os.IsNotExist(err) {
 			log.Printf("Error loading env file %s: %v", envFile, err)
 		}
-	} else {
-		log.Printf("Successfully loaded env file: %s", envFile)
 	}
 }
 

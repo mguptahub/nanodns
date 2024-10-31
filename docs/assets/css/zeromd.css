@@ -21,3 +21,7 @@
     border-radius: 5px !important;
     backdrop-filter: brightness(0.9);
 }
+
+code{
+    white-space: pre-wrap;
+}
