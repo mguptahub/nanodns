@@ -179,7 +179,7 @@ func startDaemon() {
 	}
 
 	// cmd := exec.Command(os.Args[0])
-	cmd, err := security.SecureCommand(os.Args[0], os.Args[1:]...)
+	cmd, err := security.SecureCommand(security.CmdNanoDNS, "-config", "config.yaml")
 	if err != nil {
 		log.Fatalf("Security error: %v", err)
 	}

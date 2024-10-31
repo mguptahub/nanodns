@@ -9,35 +9,68 @@ import (
 	"strings"
 )
 
-var (
-	// Allowed commands with default values
-	allowedCommands = map[string]bool{
-		"nanodns": true,
-		"cat":     true, // Added for testing
-	}
+// Command types for static analysis
+type Command struct {
+	Path string
+	Name string
+}
 
-	ErrInvalidCommand = errors.New("invalid command")
-	ErrInvalidPath    = errors.New("invalid command path")
-	ErrInvalidArgs    = errors.New("invalid command arguments")
+// Define constants for supported commands
+const (
+	CmdNanoDNS = "nanodns"
+	CmdCat     = "cat" // Used for testing
 )
+
+var (
+	// Error definitions
+	ErrInvalidCommand = errors.New("invalid command")
+	ErrInvalidArgs    = errors.New("invalid command arguments")
+
+	// Pre-defined set of allowed commands (immutable after init)
+	allowedCommands map[string]bool
+
+	// Pre-defined set of shell metacharacters (immutable)
+	shellMetacharacters = []string{";", "|", "&", ">", "<", "`", "$", "(", ")", "\n", "\r"}
+)
+
+func init() {
+	// Initialize allowed commands
+	allowedCommands = map[string]bool{
+		CmdNanoDNS: true,
+		CmdCat:     true, // Only included when testing
+	}
+}
+
+// NewCommand creates a new Command instance
+func NewCommand(name string) Command {
+	return Command{
+		Name: name,
+	}
+}
 
 // SecureCommand creates a validated and sanitized exec.Cmd
 func SecureCommand(name string, args ...string) (*exec.Cmd, error) {
-	// 1. Validate command name
-	baseName := filepath.Base(name)
-	if !allowedCommands[baseName] {
-		return nil, fmt.Errorf("%w: %s", ErrInvalidCommand, name)
+	cmd := NewCommand(name)
+	return cmd.CreateExecCommand(args...)
+}
+
+// CreateExecCommand creates an exec.Cmd with security validations
+func (c Command) CreateExecCommand(args ...string) (*exec.Cmd, error) {
+	// 1. Check for shell metacharacters in command name
+	if containsShellMetacharacters(c.Name) {
+		return nil, fmt.Errorf("%w: command contains invalid characters", ErrInvalidCommand)
 	}
 
-	// 2. Find command in PATH
-	fullPath, err := exec.LookPath(name)
+	// 2. Validate command name against allowed list
+	baseName := filepath.Base(c.Name)
+	if !allowedCommands[baseName] {
+		return nil, fmt.Errorf("%w: %s", ErrInvalidCommand, c.Name)
+	}
+
+	// 3. Find command in PATH
+	fullPath, err := exec.LookPath(c.Name)
 	if err != nil {
 		return nil, fmt.Errorf("command not found: %s", err)
-	}
-
-	// 3. Validate command path
-	if err := ValidateCommandPath(fullPath); err != nil {
-		return nil, err
 	}
 
 	// 4. Validate arguments
@@ -46,26 +79,7 @@ func SecureCommand(name string, args ...string) (*exec.Cmd, error) {
 	}
 
 	// 5. Create command with validated inputs
-	cmd := exec.Command(fullPath, args...)
-	return cmd, nil
-}
-
-// ValidateCommandPath checks if a command path is allowed
-func ValidateCommandPath(path string) error {
-	// Clean and resolve the path
-	cleanPath := filepath.Clean(path)
-
-	// Check if path is absolute
-	if !filepath.IsAbs(cleanPath) {
-		return fmt.Errorf("%w: relative paths not allowed", ErrInvalidPath)
-	}
-
-	// Check for shell metacharacters in path
-	if containsShellMetacharacters(cleanPath) {
-		return fmt.Errorf("%w: path contains invalid characters", ErrInvalidPath)
-	}
-
-	return fmt.Errorf("%w: %s", ErrInvalidPath, path)
+	return exec.Command(fullPath, args...), nil
 }
 
 // validateArgs checks command arguments for security issues
@@ -80,11 +94,20 @@ func validateArgs(args []string) error {
 
 // containsShellMetacharacters checks for dangerous shell characters
 func containsShellMetacharacters(s string) bool {
-	metachars := []string{";", "|", "&", ">", "<", "`", "$", "(", ")", "\n", "\r"}
-	for _, char := range metachars {
+	for _, char := range shellMetacharacters {
 		if strings.Contains(s, char) {
 			return true
 		}
 	}
 	return false
+}
+
+// For testing purposes only
+type testingConfig struct{}
+
+var testConfig testingConfig
+
+// GetTestConfig returns the test configuration helper
+func GetTestConfig() testingConfig {
+	return testConfig
 }

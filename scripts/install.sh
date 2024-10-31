@@ -127,10 +127,9 @@ install_binary() {
     $use_sudo install -m 755 "${TEMP_DIR}/${BINARY_NAME}" "${INSTALL_DIR}/${BINARY_NAME}"
     
     # Verify installation
-    if ! command -v $BINARY_NAME >/dev/null 2>&1; then
-        print_error "Installation failed. Binary not found in PATH"
-    fi
-    
+    if [ ! -x "${INSTALL_DIR}/${BINARY_NAME}" ]; then
+        print_error "Installation failed. Binary not found in ${INSTALL_DIR}"
+    fi    
     print_success "Installation completed"
 }
 
@@ -140,7 +139,9 @@ verify_installation() {
     
     # Check version
     local version
-    version=$($BINARY_NAME -v 2>&1)
+    if ! version=$($BINARY_NAME -v 2>&1); then  
+        print_error "Failed to execute $BINARY_NAME. Please check the installation."  
+    fi  
     print_success "Successfully installed NanoDNS $version"
 }
 
