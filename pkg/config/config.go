@@ -24,7 +24,7 @@ type RelayConfig struct {
 }
 
 func Initialize() {
-	envFile := os.Getenv("ENV_FILE")
+	envFile := os.Getenv("NANODNS_ENV_FILE")
 	if envFile == "" {
 		envFile = ".env"
 	}

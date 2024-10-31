@@ -245,15 +245,57 @@ For detailed instructions on deploying NanoDNS in Kubernetes, see our [Kubernete
 
 ## Running Without Docker Compose
 
+### Set Environment Variables
+
+> You can also use `.env` file with all variables. File must be in same folder as binary
+
 ```bash
-# Set environment variables
+# Set service environment variables
 export DNS_PORT=10053
 export DNS_RELAY_SERVERS=8.8.8.8:53,1.1.1.1:53
+
+# Logging Configuration (optional)
+export LOG_DIR="/tmp/log/nanodns"
+export SERVICE_LOG="service.log"
+export ACTION_LOG="actions.log"
+export MAX_LOG_SIZE=1048576 # 1MB
+export MAX_LOG_BACKUPS=5
+
+# Set DNS Records environment variables
 export A_REC1=app.example.com|10.10.0.7
 export TXT_REC1=example.com|v=spf1 include:_spf.example.com ~all
+```
 
-# Run the server
-./nanodns
+### Start server as daemon
+
+```bash
+./nanodns start
+```
+
+### Start server as current process
+
+```bash
+./nanodns 
+```
+
+### CLI Usage
+
+```bash
+./nanodns --help
+```
+
+```bash
+Usage: nanodns [command | options]
+
+commands:
+  start                              Run the binary as a daemon
+  stop                               Stop the running daemon service
+  status                             Show service status
+  logs                               Show service logs
+
+options:
+  -v | --version                     Show the binary version
+  -a | --action-logs                 Show the action logs. This works with the logs command
 ```
 
 ## Testing Records

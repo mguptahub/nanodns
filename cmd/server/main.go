@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 	"syscall"
@@ -12,12 +13,13 @@ import (
 
 	"github.com/mguptahub/nanodns/internal/dns"
 	"github.com/mguptahub/nanodns/internal/logging"
-	"github.com/mguptahub/nanodns/internal/security"
 	"github.com/mguptahub/nanodns/pkg/config"
 	externaldns "github.com/miekg/dns"
 )
 
 const pidFilePath = "/tmp/nanodns.pid"
+
+var logDuration time.Duration
 
 var (
 	version      = "dev" // Default version; can be overridden at build time
@@ -30,6 +32,8 @@ var (
 )
 
 func init() {
+	flag.DurationVar(&logDuration, "duration", 24*time.Hour, "Duration of logs to show (e.g., 72h, 7d)")
+
 	flag.BoolVar(&startService, "start", false, "Run the binary as a daemon")
 	flag.BoolVar(&stopService, "stop", false, "Stop the running daemon service")
 	flag.BoolVar(&showVersion, "version", false, "Show the binary version")
@@ -64,8 +68,9 @@ func init() {
 }
 
 func main() {
+	flag.Parse()
 	if len(os.Args) > 1 {
-		switch os.Args[1] {
+		switch flag.Arg(0) {
 		case "start":
 			startDaemon()
 			return
@@ -86,8 +91,6 @@ func main() {
 			return
 		}
 	}
-
-	flag.Parse()
 
 	if showHelp {
 		flag.Usage()
@@ -141,7 +144,11 @@ func startDNSServer() {
 	}
 
 	// Create DNS handler
-	handler, _ := dns.NewHandler(records, relayConfig)
+	handler, err := dns.NewHandler(records, relayConfig)
+	if err != nil {
+		logging.LogService(fmt.Sprintf("Failed to create DNS handler: %v", err))
+		log.Fatalf("Failed to create DNS handler: %v", err)
+	}
 	externaldns.HandleFunc(".", handler.ServeDNS)
 
 	// Configure server
@@ -179,10 +186,7 @@ func startDaemon() {
 	}
 
 	// cmd := exec.Command(os.Args[0])
-	cmd, err := security.SecureCommand(security.CmdNanoDNS, "-config", "config.yaml")
-	if err != nil {
-		log.Fatalf("Security error: %v", err)
-	}
+	cmd := exec.Command(os.Args[0])
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setsid: true,
 	}
@@ -299,7 +303,7 @@ func showSelectiveLogs() {
 
 func showServiceLogs() {
 	// Use the new configuration-aware logging package
-	logs, err := logging.GetServiceLogs(24 * time.Hour)
+	logs, err := logging.GetServiceLogs(logDuration)
 	if err != nil {
 		fmt.Printf("Failed to read service logs: %v\n", err)
 		return
@@ -310,7 +314,7 @@ func showServiceLogs() {
 	}
 }
 func showActionLogs() {
-	logs, err := logging.GetActionLogs(24 * time.Hour)
+	logs, err := logging.GetActionLogs(logDuration)
 	if err != nil {
 		fmt.Printf("Failed to read action logs: %v\n", err)
 		return
