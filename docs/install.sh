@@ -10,6 +10,8 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
 NC='\033[0m' # No Color
 
 # Configuration
@@ -17,6 +19,37 @@ GITHUB_REPO="mguptahub/nanodns"
 INSTALL_DIR="/usr/local/bin"
 BINARY_NAME="nanodns"
 TEMP_DIR="/tmp/nanodns_install"
+
+# Get latest version from GitHub
+get_latest_version() {
+    curl -fsSL "https://api.github.com/repos/${GITHUB_REPO}/releases/latest" | \
+    jq -r '.tag_name'
+}
+
+# Print banner with ASCII art
+print_banner() {
+    # Get the latest version
+    VERSION=$(get_latest_version)
+    
+    echo
+    echo "${WHITE}"
+    echo "  ███╗   ██╗ █████╗ ███╗   ██╗ ██████╗"
+    echo "  ████╗  ██║██╔══██╗████╗  ██║██╔═══██╗"
+    echo "  ██╔██╗ ██║███████║██╔██╗ ██║██║   ██║"
+    echo "  ██║╚██╗██║██╔══██║██║╚██╗██║██║   ██║"
+    echo "  ██║ ╚████║██║  ██║██║ ╚████║╚██████╔╝"
+    echo "  ╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝"
+    echo "${CYAN}              DNS SERVER${NC}"
+    echo
+    echo "  ${CYAN}• Lightweight DNS Server${NC}"
+    if [ -n "$VERSION" ]; then
+        echo "  ${CYAN}• Version: ${VERSION}${NC}"
+    fi
+    echo "  ${CYAN}• GitHub: ${GITHUB_REPO}${NC}"
+    echo
+    echo "=================================================="
+    echo
+}
 
 # Print step information
 print_step() {
@@ -64,7 +97,7 @@ detect_system() {
     OS=$(uname -s | tr '[:upper:]' '[:lower:]')
     
     # Detect architecture and normalize names
-    local arch=$(uname -m)
+    arch=$(uname -m)
     case $arch in
         x86_64)  ARCH="amd64" ;;
         aarch64) ARCH="arm64" ;;
@@ -98,7 +131,7 @@ download_binary() {
     rm -rf "${TEMP_DIR:?}/*"
     
     # Download binary
-    local binary_path="${TEMP_DIR}/${BINARY_NAME}"
+    binary_path="${TEMP_DIR}/${BINARY_NAME}"
     if ! curl -fsSL "$DOWNLOAD_URL" -o "$binary_path"; then
         print_error "Failed to download binary"
     fi
@@ -114,7 +147,7 @@ install_binary() {
     print_step "Installing NanoDNS..."
     
     # Check if we need sudo
-    local use_sudo=""
+    use_sudo=""
     if [ ! -w "$INSTALL_DIR" ]; then
         if command -v sudo >/dev/null 2>&1; then
             use_sudo="sudo"
@@ -138,7 +171,7 @@ verify_installation() {
     print_step "Verifying installation..."
     
     # Check version
-    local version
+    version=""
     if ! version=$($BINARY_NAME -v 2>&1); then  
         print_error "Failed to execute $BINARY_NAME. Please check the installation."  
     fi  
@@ -152,11 +185,38 @@ cleanup() {
     print_success "Cleanup completed"
 }
 
-# Main installation process
-main() {
-    echo "NanoDNS Installer"
-    echo "----------------"
-    
+# Uninstall NanoDNS
+do_uninstall() {
+    print_banner
+    print_step "Uninstalling NanoDNS..."
+
+    # Check if binary exists
+    if [ ! -f "${INSTALL_DIR}/${BINARY_NAME}" ]; then
+        print_warning "NanoDNS is not installed in ${INSTALL_DIR}"
+        return 0
+    fi
+
+    # Check if we need sudo
+    use_sudo=""
+    if [ ! -w "$INSTALL_DIR" ]; then
+        if command -v sudo >/dev/null 2>&1; then
+            use_sudo="sudo"
+        else
+            print_error "Install directory is not writable and sudo is not available"
+        fi
+    fi
+
+    # Remove binary
+    if ! $use_sudo rm -f "${INSTALL_DIR}/${BINARY_NAME}"; then
+        print_error "Failed to remove NanoDNS"
+    fi
+
+    print_success "NanoDNS has been successfully uninstalled"
+}
+
+# Perform installation
+do_install() {
+    print_banner
     check_requirements
     detect_system
     get_download_url
@@ -170,4 +230,52 @@ main() {
     echo "Run 'nanodns --help' to get started"
 }
 
+# Print usage information
+usage() {
+    print_banner
+    echo "Usage: $0 [--install|--uninstall|--help]"
+    echo
+    echo "Commands:"
+    echo "  --install      Install NanoDNS"
+    echo "  --uninstall    Uninstall NanoDNS"
+    echo "  --help         Show this help message (default)"
+    echo
+    echo "Examples:"
+    echo "  Install:    curl -fsSL https://nanodns.mguptahub.com/install.sh | sh - --install"
+    echo "  Uninstall:  curl -fsSL https://nanodns.mguptahub.com/install.sh | sh - --uninstall"
+}
+
+# Main process
+main() {
+    # Handle no arguments case (default to help)
+    if [ $# -eq 0 ]; then
+        usage
+        exit 0
+    fi
+
+    # Parse command line arguments
+    for arg in "$@"; do
+        case $arg in
+            --install)
+                do_install
+                exit 0
+                ;;
+            --uninstall)
+                do_uninstall
+                exit 0
+                ;;
+            --help)
+                usage
+                exit 0
+                ;;
+            *)
+                print_error "Unknown option: $arg"
+                usage
+                exit 1
+                ;;
+        esac
+    done
+}
+
+# Run main with all arguments
 main "$@"
