@@ -148,5 +148,4 @@ jobs:
             nanodns-linux-arm64
             nanodns-darwin-amd64
             nanodns-darwin-arm64
-            scripts/install.sh
           generate_release_notes: true
