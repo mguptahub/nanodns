@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # install.sh - NanoDNS Installation Script
 
@@ -170,8 +170,4 @@ main() {
     echo "Run 'nanodns --help' to get started"
 }
 
-# Run main if script is executed directly (not sourced)
-if [ "${BASH_SOURCE[0]}" -ef "$0" ]; then
-    trap cleanup EXIT
-    main "$@"
-fi
+main "$@"
