@@ -1,13 +1,17 @@
 
 ### Using Linux Terminal
 
+Install using the script
+
 ```bash
+curl -fsSL https://nanodns.mguptahub.com/install.sh | sh -s -- --install
+```
 
-curl -fsSL https://github.com/mguptahub/nanodns/releases/download/v1.1.3/nanodns-linux-amd64 -o /usr/local/bin/nanodns && chmod +x /usr/local/bin/nanodns
+Start using the script
 
+```bash
+# Check the values in /usr/local/share/nanodns.env before starting
 nanodns start
-
-
 ```
 
 Help Command
