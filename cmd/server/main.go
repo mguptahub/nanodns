@@ -36,10 +36,11 @@ func init() {
 
 	flag.BoolVar(&startService, "start", false, "Run the binary as a daemon")
 	flag.BoolVar(&stopService, "stop", false, "Stop the running daemon service")
+	flag.BoolVar(&showStatus, "status", false, "Show service status")
 	flag.BoolVar(&showVersion, "version", false, "Show the binary version")
 	flag.BoolVar(&showVersion, "v", false, "Show the binary version (short)")
 	flag.BoolVar(&showHelp, "help", false, "Shows help information")
-	flag.BoolVar(&showStatus, "status", false, "Show service status")
+	flag.BoolVar(&showHelp, "h", false, "Shows help information (short)")
 
 	flag.BoolVar(&showLogs, "logs", false, "Show the logs")
 
@@ -53,10 +54,11 @@ func init() {
 		fmt.Println("  stop                               Stop the running daemon service")
 		fmt.Println("  status                             Show service status")
 		fmt.Println("  logs                               Show service logs")
+		fmt.Println("  logs -a                            Show action logs")
 		fmt.Println("")
 		fmt.Println("options:")
 		fmt.Println("  -v | --version                     Show the binary version")
-		fmt.Println("  -a | --action-logs                 Show the action logs. This works with the logs command")
+		fmt.Println("  -h | --help                        Show the help information")
 	}
 
 	config.Initialize()
@@ -68,7 +70,9 @@ func init() {
 }
 
 func main() {
-	if len(os.Args) > 1 {
+	flag.Parse()
+	// fmt.Println(flag.Args())
+	if len(flag.Args()) > 0 {
 		switch flag.Arg(0) {
 		case "start":
 			startDaemon()
@@ -79,25 +83,23 @@ func main() {
 		case "status":
 			checkServiceStatus()
 			return
-		case "logs", "log":
+		case "logs":
 			showSelectiveLogs()
 			return
 		case "help":
 			flag.Usage()
 			return
+		case "version", "v":
+			printVersion()
+			return
+		default:
+			flag.Usage()
+			return
 		}
 	}
-	flag.Parse()
 
 	if showHelp {
 		flag.Usage()
-		return
-	}
-
-	if showVersion {
-		fmt.Println("")
-		fmt.Printf("NanoDNS Version: %s\n", version)
-		fmt.Println("")
 		return
 	}
 
@@ -125,8 +127,19 @@ func main() {
 		return
 	}
 
-	// Regular server startup if no flags are provided
-	startDNSServer()
+	if showLogs {
+		showServiceLogs()
+		return
+	}
+
+	if showVersion {
+		printVersion()
+		return
+	}
+
+	if len(os.Args) == 1 {
+		startDNSServer()
+	}
 }
 
 func startDNSServer() {
@@ -312,6 +325,7 @@ func showServiceLogs() {
 		fmt.Println(entry)
 	}
 }
+
 func showActionLogs() {
 	logs, err := logging.GetActionLogs(logDuration)
 	if err != nil {
@@ -322,4 +336,10 @@ func showActionLogs() {
 	for _, entry := range logs {
 		fmt.Println(entry)
 	}
+}
+
+func printVersion() {
+	fmt.Println("")
+	fmt.Printf("NanoDNS Version: %s\n", version)
+	fmt.Println("")
 }

@@ -20,6 +20,7 @@ nanodns --help
 ```
 
 ```
+
 Usage: nanodns [command | options]
 
 commands:
@@ -27,9 +28,9 @@ commands:
   stop                               Stop the running daemon service
   status                             Show service status
   logs                               Show service logs
+  logs -a                            Show action logs
 
 options:
   -v | --version                     Show the binary version
-  -a | --action-logs                 Show the action logs. This works with the logs command
-
+  -h | --help                        Show the help information
 ```
